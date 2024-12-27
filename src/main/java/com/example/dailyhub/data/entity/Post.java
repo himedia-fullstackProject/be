@@ -53,7 +53,15 @@ public class Post {
 
   @Column(nullable = true)
   @Size(max = 10)
-  private String hashtag;
+  private String tag1;
+
+  @Column(nullable = true)
+  @Size(max = 10)
+  private String tag2;
+
+  @Column(nullable = true)
+  @Size(max = 10)
+  private String tag3;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL)
   @Builder.Default
