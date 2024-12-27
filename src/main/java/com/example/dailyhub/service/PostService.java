@@ -14,24 +14,24 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public Optional<Post> getPostById(Long postId) {
+    public Optional<Post> getPostById(Long postId) {        //포스트조회
         return postRepository.findById(postId);
     }
 
-    public Post createPost(Post post) {
+    public Post createPost(Post post) {                     //포스트생성
         return postRepository.save(post);
     }
 
-    public Post updatePost(Long postId, Post updatedPost) {
+    public Post updatePost(Long postId, Post updatedPost) { //포스트수정
         updatedPost.setId(postId);
         return postRepository.save(updatedPost);
     }
 
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId) {                   //포스트삭제
         postRepository.deleteById(postId);
     }
 
-    public List<Post> searchPosts(String searchTerm) {
-        return postRepository.searchPosts(searchTerm);  // 검색 메소드 호출
+    public List<Post> searchPosts(String searchTerm) {      //포스트검색
+        return postRepository.searchPosts(searchTerm);
     }
 }
