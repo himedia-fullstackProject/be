@@ -33,8 +33,6 @@ public class SecurityConfig {
   private final JwtUtil jwtUtil;
   private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
   private final CustomAccessDeniedHandler customAccessDeniedHandler;
-//  private final CustomSuccessHandler customSuccessHandler;
-//  private final CustomOAuth2UserService customOauth2UserService;
 
   @Bean
   public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}

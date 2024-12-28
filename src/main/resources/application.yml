@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: local
+
   config:
     import: optional:file:.env[.properties]
 
@@ -19,10 +22,6 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: 'false'
-  profiles:
-    active: local
-  application:
-    name: library-be
 
 logging:
   level:
@@ -39,6 +38,21 @@ logging:
           nodeValue: debug
           web: trace
 
+app:
+  props:
+    jwt:
+      secret:
+        key: ${JWT_SECRET_KEY}
+
+    aws:
+      key:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        bucket-name: ${AWS_S3_BUCKET_NAME}
+        region: ${AWS_REGION}
+
+
 ---
 # local 데이터베이스 설정
 spring:
@@ -50,7 +64,27 @@ spring:
     url: jdbc:mysql://localhost:3308/dailyhub
     username: root
     password: 1234
+
 ---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:./db_dev;MODE=MySQL
+    username: sa
+    password:
+
+---
+
 # prod 데이터베이스 설정
 
 spring:
@@ -62,20 +96,5 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
-authen:
-  jwt:
-    secret:
-      key: ${JWT_SECRET_KEY}
-
-app:
-  props:
-    aws:
-      key:
-        access-key: ${AWS_ACCESS_KEY}
-        secret-key: ${AWS_SECRET_KEY}
-      s3:
-        bucket-name: ${AWS_S3_BUCKET_NAME}
-        region: ${AWS_REGION}
 
 

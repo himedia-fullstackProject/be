@@ -1,6 +1,8 @@
 package com.example.dailyhub.security.jwt;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,9 +14,13 @@ public class JwtUtil {
 
   private SecretKey secretKey;
 
-  public JwtUtil(@Value("${authen.jwt.secret.key}") String secretKey) {
-    this.secretKey = new SecretKeySpec(secretKey.getBytes(),
-        Jwts.SIG.HS256.key().build().getAlgorithm());
+  public JwtUtil(@Value("${app.props.jwt.secret.key}") String secretKeyString) {
+    System.out.println("Loaded secret key: " + secretKeyString); // 디버깅 메시지
+    if (secretKeyString == null || secretKeyString.isEmpty()) {
+      throw new IllegalArgumentException("JWT secret key cannot be empty");
+    }
+    byte[] keyBytes = secretKeyString.getBytes(StandardCharsets.UTF_8);
+    this.secretKey = Keys.hmacShaKeyFor(keyBytes);
   }
 
   public String getCategory(String token) {
