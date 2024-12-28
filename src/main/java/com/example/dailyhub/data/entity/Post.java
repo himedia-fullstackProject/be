@@ -11,14 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -76,7 +74,7 @@ public class Post {
   private SubCategory subCategory;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "username")
+  @JoinColumn(name = "user_id")
   private User user;
 
   @CreatedDate
