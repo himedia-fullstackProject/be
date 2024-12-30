@@ -42,9 +42,6 @@ public class Post {
   @Size(min = 1)
   private String title;
 
-  @Column(length = 255)
-  private String image;
-
   @Column(nullable = true)
   @Size(min = 5, max = 200)
   private String description;
@@ -60,6 +57,13 @@ public class Post {
   @Column(nullable = true)
   @Size(max = 10)
   private String tag3;
+
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL)
   @Builder.Default
@@ -77,11 +81,10 @@ public class Post {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @CreatedDate
-  @Column(updatable = false)
-  private LocalDateTime createdAt;
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<Image> images = new ArrayList<>();
 
-  @LastModifiedDate
-  private LocalDateTime updatedAt;
+
 
 }

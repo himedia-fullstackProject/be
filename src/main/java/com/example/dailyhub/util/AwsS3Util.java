@@ -26,6 +26,10 @@ public class AwsS3Util {
 
     private final AmazonS3 s3Client;
 
+    public String getBucketName() {
+        return bucket;
+    }
+
     /**
      * S3에 파일 업로드
      * @param filePaths 파일 경로 리스트
@@ -85,22 +89,15 @@ public class AwsS3Util {
 
     /**
      * S3에 파일 삭제
-     * @param filePaths 파일 경로 리스트
+     * @param fileKeys S3 파일 키 리스트
      */
-    public void deleteFiles(List<Path> filePaths) {
-
-        if(filePaths == null || filePaths.isEmpty()){
+    public void deleteFilesByKeys(List<String> fileKeys) {
+        if (fileKeys == null || fileKeys.isEmpty()) {
             return;
         }
 
-        for (Path filePath : filePaths) {
-//            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-//                    .bucket(bucket)
-//                    .key(filePath.toFile().getName())
-//                    .build();
-//
-//            s3Client.deleteObject(deleteObjectRequest);
-            s3Client.deleteObject(bucket, filePath.toFile().getName());
+        for (String key : fileKeys) {
+            s3Client.deleteObject(bucket, key);
         }
     }
 
