@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,6 @@ public class ImageServiceImpl implements ImageService {
 
   /**
    * 임시 이미지 업로드
-   *
    * @param file 업로드할 이미지 파일
    * @return 저장된 이미지 정보
    */
@@ -65,8 +65,24 @@ public class ImageServiceImpl implements ImageService {
   }
 
   /**
+   * 여러 임시 이미지 업로드
+   * @param files 업로드할 이미지 파일 리스트
+   * @return 저장된 이미지 정보 리스트
+   */
+  @Transactional
+  public List<Image> uploadTempImages(List<MultipartFile> files) {
+    List<Image> images = new ArrayList<>();
+
+    for (MultipartFile file : files) {
+      Image image = uploadTempImage(file); // 개별 이미지 업로드 처리
+      images.add(image);
+    }
+
+    return images;
+  }
+
+  /**
    * 임시 이미지 삭제
-   *
    * @param imageId 삭제할 이미지 ID
    */
   @Transactional
@@ -81,5 +97,24 @@ public class ImageServiceImpl implements ImageService {
 
     // DB 삭제
     imageRepository.delete(image);
+  }
+
+  /**
+   * 여러 임시 이미지 삭제
+   * @param imageIds 삭제할 이미지 ID 리스트
+   */
+  @Transactional
+  public void deleteTempImages(List<Long> imageIds) {
+    List<Image> images = imageRepository.findAllById(imageIds);
+
+    List<String> fileKeys = new ArrayList<>();
+    for (Image image : images) {
+      String fileKey = image.getUrl().substring(image.getUrl().lastIndexOf("/") + 1);
+      fileKeys.add(fileKey);
+    }
+
+    // S3와 DB에서 삭제
+    awsS3Util.deleteFilesByKeys(fileKeys);
+    imageRepository.deleteAll(images);
   }
 }
