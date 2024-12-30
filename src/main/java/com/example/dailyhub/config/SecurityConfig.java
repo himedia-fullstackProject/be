@@ -57,10 +57,11 @@ public class SecurityConfig {
         .formLogin(formLogin -> formLogin.disable())
         .httpBasic(httpBasic -> httpBasic.disable())
         .authorizeHttpRequests(authorize ->
-            authorize.requestMatchers("/**")
-                .permitAll()
-                .requestMatchers("/").hasAnyRole("ADMIN")
-                .anyRequest().authenticated()
+            authorize
+//                .requestMatchers("/**").permitAll()
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                .anyRequest().permitAll()
+//                .anyRequest().authenticated()
         );
 
     http.cors(cors -> cors.configurationSource(request -> {
