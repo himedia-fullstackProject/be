@@ -1,26 +1,25 @@
-package com.example.dailyhub.data;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.LocalDate;
-import java.util.stream.LongStream;
-
-@Slf4j
-@Configuration
-@Profile({"test"})
-public class NotProd {
-
+//package com.example.dailyhub.data;
+//
+//import com.example.dailyhub.data.repository.PostRepository;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.boot.CommandLineRunner;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.context.annotation.Profile;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//
+//import java.time.LocalDate;
+//import java.util.stream.LongStream;
+//
+//@Slf4j
+//@Configuration
+//@Profile({"test"})
+//public class NotProd {
+//
 //  @Bean
 //  CommandLineRunner initData(
-//      TodoRepository todoRepository,
-//      PasswordEncoder passwordEncoder,
-//      MemberRepository memberRepository,
-//      ProductRepository productRepository
+//      PostRepository postRepository,
+//      PasswordEncoder passwordEncoder
 //  ) {
 //    return (args) -> {
 //      log.info("init data...");
@@ -51,36 +50,7 @@ public class NotProd {
 //
 //
 //      });
-//
-//      LongStream.rangeClosed(1, 5).forEach(i -> {
-//        // member data
-//        Member member = Member.builder()
-//            .email("user" + i + "@aaa.com")
-//            .pw(passwordEncoder.encode("1111"))
-//            .nickname("nick_" + i)
-//            .social(false)
-//            .build();
-//
-//        member.addRole(MemberRole.ADMIN);
-//
-//        memberRepository.save(member);
-//
-//      });
-//
-//      LongStream.rangeClosed(6, 10).forEach(i -> {
-//        // todo data
-//        Member member = Member.builder()
-//            .email("user" + i + "@aaa.com")
-//            .pw(passwordEncoder.encode("1111"))
-//            .nickname("nick_" + i)
-//            .social(false)
-//            .build();
-//
-//        member.addRole(MemberRole.USER);
-//
-//        memberRepository.save(member);
-//      });
 //    };
 //  }
-
-}
+//
+//}

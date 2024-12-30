@@ -11,14 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,9 +42,6 @@ public class Post {
   @Size(min = 1)
   private String title;
 
-  @Column(length = 255)
-  private String image;
-
   @Column(nullable = true)
   @Size(min = 5, max = 200)
   private String description;
@@ -63,6 +58,13 @@ public class Post {
   @Size(max = 10)
   private String tag3;
 
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
+
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL)
   @Builder.Default
   private List<Likes> likes = new ArrayList<>();
@@ -76,14 +78,13 @@ public class Post {
   private SubCategory subCategory;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "username")
+  @JoinColumn(name = "user_id")
   private User user;
 
-  @CreatedDate
-  @Column(updatable = false)
-  private LocalDateTime createdAt;
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<Image> images = new ArrayList<>();
 
-  @LastModifiedDate
-  private LocalDateTime updatedAt;
+
 
 }

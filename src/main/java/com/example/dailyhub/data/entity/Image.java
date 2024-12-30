@@ -1,5 +1,6 @@
 package com.example.dailyhub.data.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,27 +14,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
-@ToString(exclude = {"user","post"})
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "likes_tbl")
-public class Likes {
+@AllArgsConstructor
+@Builder
+@Table(name = "imgae_tbl")
+public class Image {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long count;
+  @Column(nullable = false)
+  private String url;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
+  @Column(nullable = false)
+  private boolean isTemporary;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")

@@ -1,5 +1,10 @@
 package com.example.dailyhub.config;
 
+import com.example.dailyhub.component.CustomAccessDeniedHandler;
+import com.example.dailyhub.component.CustomAuthenticationEntryPoint;
+import com.example.dailyhub.security.jwt.JwtFilter;
+import com.example.dailyhub.security.jwt.JwtUtil;
+import com.example.dailyhub.security.jwt.LoginFilter;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +29,10 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 public class SecurityConfig {
 
-//  private final AuthenticationConfiguration authenticationConfiguration;
-//  private final JwtUtil jwtUtil;
-//  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-//  private final CustomAccessDeniedHandler customAccessDeniedHandler;
-//  private final CustomOAuth2UserService customOauth2UserService;
-//  private final CustomSuccessHandler customSuccessHandler;
+  private final AuthenticationConfiguration authenticationConfiguration;
+  private final JwtUtil jwtUtil;
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
   @Bean
   public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
@@ -54,10 +57,11 @@ public class SecurityConfig {
         .formLogin(formLogin -> formLogin.disable())
         .httpBasic(httpBasic -> httpBasic.disable())
         .authorizeHttpRequests(authorize ->
-            authorize.requestMatchers("/")
-                .permitAll()
-                .requestMatchers("/").hasAnyRole("ADMIN")
-                .anyRequest().authenticated()
+            authorize
+//                .requestMatchers("/**").permitAll()
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                .anyRequest().permitAll()
+//                .anyRequest().authenticated()
         );
 
     http.cors(cors -> cors.configurationSource(request -> {
@@ -87,11 +91,11 @@ public class SecurityConfig {
     http.sessionManagement(session ->
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-//    http.addFilterBefore(new JwtFilter(this.jwtUtil), LoginFilter.class);
-//
-//    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-//        UsernamePasswordAuthenticationFilter.class);
-//
+    http.addFilterBefore(new JwtFilter(this.jwtUtil), LoginFilter.class);
+
+    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
+        UsernamePasswordAuthenticationFilter.class);
+
 //    http.oauth2Login(oauth2 -> oauth2
 //        .userInfoEndpoint(
 //            userInfo -> userInfo.userService(customOauth2UserService)) // 사용자 정보 서비스 설정
@@ -101,12 +105,12 @@ public class SecurityConfig {
 //          response.getWriter().write("OAuth2 Login Failed");
 //        })
 //    );
-//
-//    http.exceptionHandling(exception -> {
-//          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
-//          exception.accessDeniedHandler(customAccessDeniedHandler);
-//        }
-//    );
+
+    http.exceptionHandling(exception -> {
+          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
+          exception.accessDeniedHandler(customAccessDeniedHandler);
+        }
+    );
 
     return http.build();
   }
