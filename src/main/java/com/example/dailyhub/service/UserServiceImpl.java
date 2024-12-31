@@ -4,6 +4,7 @@ import com.example.dailyhub.data.dto.UserDTO;
 import com.example.dailyhub.data.entity.User;
 import com.example.dailyhub.data.entity.User.UserRole;
 import com.example.dailyhub.data.repository.UserRepository;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     User user = toEntity(userDTO);
+    user.setJoinDate(LocalDate.now());
     user.setRole(UserRole.USER);
     User saveUser = userRepository.save(user);
     toDTO(saveUser);

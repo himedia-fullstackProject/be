@@ -1,6 +1,5 @@
 package com.example.dailyhub.data.page;
 
-import com.example.dailyhub.data.dto.PostDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
