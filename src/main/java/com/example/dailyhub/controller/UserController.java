@@ -1,6 +1,5 @@
 package com.example.dailyhub.controller;
 
-import com.example.dailyhub.data.dao.UserDAO;
 import com.example.dailyhub.data.dto.UserDTO;
 import com.example.dailyhub.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ public class UserController {
 
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
-  private final UserDAO userDAO;
 
   @GetMapping("/id")
   public ResponseEntity<UserDTO> getUser(@RequestParam Long id) {

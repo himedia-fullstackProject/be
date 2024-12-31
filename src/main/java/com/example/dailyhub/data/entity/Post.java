@@ -1,5 +1,6 @@
 package com.example.dailyhub.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -80,11 +81,5 @@ public class Post {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private List<Image> images = new ArrayList<>();
-
-
 
 }
