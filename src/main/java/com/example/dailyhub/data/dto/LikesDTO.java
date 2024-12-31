@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class LikesDTO {
     private Long id; // 좋아요 ID
     private Long count; // 좋아요 수
-    private String username; // 좋아요를 누른 사용자 정보
+    private String userId; // 좋아요를 누른 사용자 정보
+    private Long postId;
 }
