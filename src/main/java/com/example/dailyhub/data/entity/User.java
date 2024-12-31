@@ -56,6 +56,9 @@ public class User {
   private String phoneNumber;
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
+  private LocalDate joinDate;
+
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate birthday;
 
   @Enumerated(EnumType.STRING)
