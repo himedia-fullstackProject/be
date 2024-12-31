@@ -4,7 +4,6 @@ import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.data.dto.PostDTO;
 import com.example.dailyhub.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +32,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO) {
         Post post = convertToEntity(postDTO);
+        // likes는 초기화하지 않음
         Post createdPost = postService.createPost(post);
         return new ResponseEntity<>(convertToDTO(createdPost), HttpStatus.CREATED);
     }
@@ -41,6 +41,7 @@ public class PostController {
     public ResponseEntity<PostDTO> updatePost(@PathVariable Long id, @RequestBody PostDTO postDTO) {
         Post post = convertToEntity(postDTO);
         post.setId(id); // ID를 설정
+        // likes는 수정하지 않음
         Post updatedPost = postService.updatePost(id, post);
         return new ResponseEntity<>(convertToDTO(updatedPost), HttpStatus.OK);
     }
@@ -67,7 +68,7 @@ public class PostController {
         return new ResponseEntity<>(postDTOs, HttpStatus.OK);
     }
 
-    // Entity to DTO 변환 메서드
+    // Entity to DTO 변환 메서드 (likes는 포함하지 않음)
     private PostDTO convertToDTO(Post post) {
         return PostDTO.builder()
                 .id(post.getId())
@@ -77,7 +78,7 @@ public class PostController {
                 .tag1(post.getTag1())
                 .tag2(post.getTag2())
                 .tag3(post.getTag3())
-//                .likes(post.getLikes()) // 필요시 LikesDTO로 변환
+                // likes는 포함하지 않음
                 .mainCategoryId(post.getMainCategory() != null ? post.getMainCategory().getId() : null)
                 .subCategoryId(post.getSubCategory() != null ? post.getSubCategory().getId() : null)
                 .username(post.getUser() != null ? post.getUser().getUsername() : null)
@@ -86,7 +87,7 @@ public class PostController {
                 .build();
     }
 
-    // DTO to Entity 변환 메서드
+    // DTO to Entity 변환 메서드 (likes는 포함하지 않음)
     private Post convertToEntity(PostDTO postDTO) {
         return Post.builder()
                 .title(postDTO.getTitle())
@@ -95,7 +96,7 @@ public class PostController {
                 .tag1(postDTO.getTag1())
                 .tag2(postDTO.getTag2())
                 .tag3(postDTO.getTag3())
-                // likes 및 카테고리 설정 필요
+                // likes는 포함하지 않음
                 .build();
     }
 }
