@@ -39,8 +39,7 @@ public class LikesController {
     public void changeLikes(@RequestBody PostDTO postDTO) {
         String userName = postDTO.getUsername();
         Long postId = postDTO.getId();
-        User user;
-        user = userRepository.findByUsername(userName)
+        String user = UserRepository.findByUsername(userName)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보 조회 실패"));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("유저와 포스트 조회 실패 "));

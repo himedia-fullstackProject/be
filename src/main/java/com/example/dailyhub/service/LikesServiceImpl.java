@@ -51,33 +51,27 @@ public class LikesServiceImpl implements LikesService {
                 .build();
     }
 
-
     @Override
+    @Transactional
     public void changeLikes(User user, Post post) {
         boolean exists = likesRepository.existByUserAndPost(user, post);
-        // 좋아요 존재 여부 확인
+
         if (exists) {
             // 이미 좋아요가 있는 경우 -> 좋아요 삭제
-            Likes likes = likesRepository.findLikesByPostAndUser(user,post)
-                    .orElseThrow(() -> new IllegalArgumentException("좋아요를 찾을 수 없습니다."));
+            Likes likes = likesRepository.findLikesByPostAndUser(post , user)
+                    .orElseThrow(() -> new LikesNotFoundException("좋아요를 찾을 수 없습니다."));
 
-            // DB에서 좋아요 삭제
+            likes.setPost(null);
             likesRepository.delete(likes);
-
-            // 게시글의 좋아요 목록에서도 제거
-            post.getLikes().remove(likes);
         } else {
             // 좋아요가 없는 경우 -> 새로운 좋아요 추가
             Likes newLike = Likes.builder()
                     .user(user)
                     .post(post)
-                    .count(1L)  // 좋아요 카운트 1 추가
+                    .count(1L)
                     .build();
 
-            // DB에 새 좋아요 저장
             likesRepository.save(newLike);
-
-            // 게시글의 좋아요 목록에 추가
             post.getLikes().add(newLike);
         }
     }
