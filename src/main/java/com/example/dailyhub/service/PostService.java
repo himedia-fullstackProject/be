@@ -2,6 +2,7 @@ package com.example.dailyhub.service;
 
 import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.data.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,33 +12,33 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    public Optional<Post> getPostById(Long postId) {        // 포스트 조회
+    public Optional<Post> getPostById(Long postId) {
         return postRepository.findById(postId);
     }
 
-    public Post createPost(Post post) {                     // 포스트 생성
+    public Post createPost(Post post) {
         return postRepository.save(post);
     }
 
-    public Post updatePost(Long postId, Post updatedPost) { // 포스트 수정
+    public Post updatePost(Long postId, Post updatedPost) {
         updatedPost.setId(postId);
         return postRepository.save(updatedPost);
     }
 
-    public void deletePost(Long postId) {                   // 포스트 삭제
+    public void deletePost(Long postId) {
         postRepository.deleteById(postId);
     }
 
-    public List<Post> searchPosts(String searchTerm) {      // 포스트 검색
+    public List<Post> searchPosts(String searchTerm) {
         return postRepository.searchPosts(searchTerm);
     }
 
-    public Page<Post> getAllPosts(Pageable pageable) {      // 모든 포스트 조회 및 페이지네이션
+    public Page<Post> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
 }
