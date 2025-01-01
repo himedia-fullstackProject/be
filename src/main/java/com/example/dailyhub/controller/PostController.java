@@ -6,6 +6,7 @@ import com.example.dailyhub.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -53,10 +54,31 @@ public class PostController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PostDTO>> searchPosts(@RequestParam String searchTerm) {
-        List<Post> posts = postService.searchPosts(searchTerm);
-        List<PostDTO> postDTOs = posts.stream().map(this::convertToDTO).toList();
+    public ResponseEntity<Page<PostDTO>> searchPosts(
+            @RequestParam(required = true) String searchTerm,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {
+        if (StringUtils.isEmpty(searchTerm)) {
+            throw new IllegalArgumentException("검색어를 입력해주세요.");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.searchPosts(searchTerm, pageable);
+        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
         return new ResponseEntity<>(postDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/search/tag")
+    public ResponseEntity<Page<PostDTO>> searchPostsByTag(
+            @RequestParam(required = true) String tag,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {
+        if (StringUtils.isEmpty(tag)) {
+            throw new IllegalArgumentException("태그를 입력해주세요.");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> tagPosts = postService.getAllHashTagSearchPosts(tag, pageable);
+        Page<PostDTO> tagPostDTOs = tagPosts.map(this::convertToDTO);
+        return new ResponseEntity<>(tagPostDTOs, HttpStatus.OK);
     }
 
     @GetMapping
@@ -99,4 +121,6 @@ public class PostController {
                 // likes는 포함하지 않음
                 .build();
     }
+
+
 }

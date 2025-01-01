@@ -9,6 +9,8 @@ import com.example.dailyhub.data.repository.LikesRepository;
 import com.example.dailyhub.data.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,18 +27,30 @@ public class LikesServiceImpl implements LikesService {
     private final LikesRepository likesRepository;
     private final UserRepository userRepository;
 
+//좋아요 누른 포스트 상세보기
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<PostDTO> readLikesPostsByUser(User user) {
+//        List<PostDTO> list = new ArrayList<>();
+//        for (Likes likes : likesRepository.findAllByUser(user)) {
+//            Post post = likes.getPost();
+//            PostDTO postDTO = convertPostToDTO(post);
+//            list.add(postDTO);
+//        }
+//        return list; // 좋아요를 누른 list<PostDTO> 반환
+//
+//    }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> readLikesPostsByUser(User user) {
-        List<PostDTO> list = new ArrayList<>();
-        for (Object likes : likesRepository.findAllLikesByUser(user)) {
-            PostDTO postDTO = convertPostToDTO(likes.getPost());
-            list.add(postDTO);
-        }
-        return list; // list<PostDTO> 반환
+    public Page<PostDTO> readLikesPostsByUser(User user, Pageable pageable) {
+        // 사용자가 좋아요 한 게시물
+        Page<Likes> likesPage = likesRepository.findAllByUser(user, pageable);
 
+        // Page<Likes> -> Page<PostDTO>
+        return likesPage.map(likes -> convertPostToDTO(likes.getPost()));
     }
+
     //post -> post dto
     private PostDTO convertPostToDTO(Post post) {
         return PostDTO.builder()
@@ -48,23 +62,23 @@ public class LikesServiceImpl implements LikesService {
                 .tag3(post.getTag3())
                 .mainCategoryId(post.getMainCategory().getId())
                 .subCategoryId(post.getSubCategory().getId())
+                .username(post.getUser().getUsername()) // 작성자 정보 추가
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .build();
     }
 
+
     @Override
-    @Transactional
-    public void changeLikes(User user, Post post) {
-        boolean exists = likesRepository.existByUserAndPost(user, post);
-
+    public void changeLikes(User user , Post post) {
+        boolean exists = likesRepository.existsByUserAndPost(user, post);
+               //존재하면 true , 존재하지 않으면 false
         if (exists) {
-            // 이미 좋아요가 있는 경우 -> 좋아요 삭제
-            Likes likes = likesRepository.findLikesByPostAndUser(post , user)
-                    .orElseThrow(() -> new LikesNotFoundException("좋아요를 찾을 수 없습니다."));
+            Likes likes = likesRepository.findByPostAndUser(post, user)
+                    .orElseThrow(() -> new IllegalArgumentException("좋아요를 찾을 수 없습니다."));
 
-            likes.setPost(null);
             likesRepository.delete(likes);
         } else {
-            // 좋아요가 없는 경우 -> 새로운 좋아요 추가
             Likes newLike = Likes.builder()
                     .user(user)
                     .post(post)
@@ -72,7 +86,9 @@ public class LikesServiceImpl implements LikesService {
                     .build();
 
             likesRepository.save(newLike);
-            post.getLikes().add(newLike);
+
         }
     }
+
+
 }

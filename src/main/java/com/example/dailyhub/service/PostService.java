@@ -34,11 +34,16 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
-    public List<Post> searchPosts(String searchTerm) {
-        return postRepository.searchPosts(searchTerm);
-    }
+    public Page<Post> searchPosts(String searchTerm , Pageable pageable) {
+        return postRepository.searchPosts(searchTerm , pageable);
+    } // 검색결과 페이지네이션 수정
 
     public Page<Post> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
+
+    public Page<Post> getAllHashTagSearchPosts(String tag , Pageable pageable) {
+        return postRepository.findPostsByHashtags(tag , pageable);
+    } // 헤쉬태그 검색 페이지 네이션
+
 }
