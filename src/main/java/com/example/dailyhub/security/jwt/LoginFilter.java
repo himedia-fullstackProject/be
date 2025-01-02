@@ -1,30 +1,29 @@
 package com.example.dailyhub.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
+import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
-
   private final JwtUtil jwtUtil;
 
   @Override
@@ -42,17 +41,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   @Override
   public void successfulAuthentication(HttpServletRequest request,
       HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException {
-    UserDetails userDetails = (UserDetails) auth.getPrincipal();
+    CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+
+    String userId = String.valueOf(userDetails.getId());
     String username = userDetails.getUsername();
+    String role = userDetails.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .collect(Collectors.joining());
 
-    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-    GrantedAuthority grantedAuthority = iterator.next();
-    String role = grantedAuthority.getAuthority();
-
-    if(!role.startsWith("ROLE_")) {
-      role = "ROLE_" + role;
-    }
+    LocalDate joinDate = userDetails.getJoinDate();
 
     /**
      * accessToken과 refresh 쿠키를 생성
@@ -60,13 +57,23 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String accessToken = this.jwtUtil.CreateJWT("access", username, role, 60*60*1000L);
     String refreshToken = this.jwtUtil.CreateJWT("refresh", username, role, 24*60*60*1000L);
 
+    Map<String, Object> responseData = new HashMap<>();
+    responseData.put("user_id", userId);
+    responseData.put("username", username);
+    responseData.put("nickname", userDetails.getNickname());
+    responseData.put("phone_number", userDetails.getPhoneNumber());
+    responseData.put("joinDate", joinDate);
+    responseData.put("role", role);
+
     ObjectMapper objectMapper = new ObjectMapper();
-    String jsonmessage = objectMapper.writeValueAsString(role);
+    objectMapper.registerModule(new JavaTimeModule());
+    String jsonMessage = objectMapper.writeValueAsString(responseData);
 
     response.addHeader("Authorization", "Bearer " + accessToken);
     response.addCookie(createCookie("refresh",refreshToken));
     response.setCharacterEncoding("UTF-8");
-    response.getWriter().write(jsonmessage); // body
+    response.setContentType("application/json");
+    response.getWriter().write(jsonMessage);
   }
 
   /**
