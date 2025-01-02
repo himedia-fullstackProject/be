@@ -1,5 +1,10 @@
 package com.example.dailyhub.config;
 
+import com.example.dailyhub.component.CustomAccessDeniedHandler;
+import com.example.dailyhub.component.CustomAuthenticationEntryPoint;
+import com.example.dailyhub.security.jwt.JwtFilter;
+import com.example.dailyhub.security.jwt.JwtUtil;
+import com.example.dailyhub.security.jwt.LoginFilter;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +29,10 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 public class SecurityConfig {
 
-//  private final AuthenticationConfiguration authenticationConfiguration;
-//  private final JwtUtil jwtUtil;
-//  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-//  private final CustomAccessDeniedHandler customAccessDeniedHandler;
-//  private final CustomOAuth2UserService customOauth2UserService;
-//  private final CustomSuccessHandler customSuccessHandler;
+  private final AuthenticationConfiguration authenticationConfiguration;
+  private final JwtUtil jwtUtil;
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
   @Bean
   public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
@@ -87,26 +90,16 @@ public class SecurityConfig {
     http.sessionManagement(session ->
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-//    http.addFilterBefore(new JwtFilter(this.jwtUtil), LoginFilter.class);
-//
-//    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-//        UsernamePasswordAuthenticationFilter.class);
-//
-//    http.oauth2Login(oauth2 -> oauth2
-//        .userInfoEndpoint(
-//            userInfo -> userInfo.userService(customOauth2UserService)) // 사용자 정보 서비스 설정
-//        .successHandler(customSuccessHandler) // 로그인 성공 시 핸들러
-//        .failureHandler((request, response, exception) -> { // 로그인 실패 시 핸들러
-//          response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//          response.getWriter().write("OAuth2 Login Failed");
-//        })
-//    );
-//
-//    http.exceptionHandling(exception -> {
-//          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
-//          exception.accessDeniedHandler(customAccessDeniedHandler);
-//        }
-//    );
+    http.addFilterBefore(new JwtFilter(this.jwtUtil), LoginFilter.class);
+
+    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
+        UsernamePasswordAuthenticationFilter.class);
+
+    http.exceptionHandling(exception -> {
+          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
+          exception.accessDeniedHandler(customAccessDeniedHandler);
+        }
+    );
 
     return http.build();
   }
