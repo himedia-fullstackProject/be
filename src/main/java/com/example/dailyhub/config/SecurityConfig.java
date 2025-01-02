@@ -95,16 +95,7 @@ public class SecurityConfig {
 
     http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
         UsernamePasswordAuthenticationFilter.class);
-
-//    http.oauth2Login(oauth2 -> oauth2
-//        .userInfoEndpoint(
-//            userInfo -> userInfo.userService(customOauth2UserService)) // 사용자 정보 서비스 설정
-//        .successHandler(customSuccessHandler) // 로그인 성공 시 핸들러
-//        .failureHandler((request, response, exception) -> { // 로그인 실패 시 핸들러
-//          response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//          response.getWriter().write("OAuth2 Login Failed");
-//        })
-//    );
+    
 
     http.exceptionHandling(exception -> {
           exception.authenticationEntryPoint(customAuthenticationEntryPoint);
