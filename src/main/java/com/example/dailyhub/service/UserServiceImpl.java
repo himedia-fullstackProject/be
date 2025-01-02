@@ -4,6 +4,7 @@ import com.example.dailyhub.data.dto.UserDTO;
 import com.example.dailyhub.data.entity.User;
 import com.example.dailyhub.data.entity.User.UserRole;
 import com.example.dailyhub.data.repository.UserRepository;
+import com.example.dailyhub.security.jwt.CustomUserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,20 +59,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Transactional
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> user = userRepository.findByUsername((username));
-    if (user.isEmpty()) {
+    Optional<User> userOptional = userRepository.findByUsername(username);
+    if (userOptional.isEmpty()) {
       throw new UsernameNotFoundException("User " + username + " not found");
     }
-    User user1 = user.get();
-
-    List<GrantedAuthority> authorities = new ArrayList<>();
-    if (user1.getRole() == UserRole.ADMIN) {
-      authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-    } else {
-      authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
-    return new org.springframework.security.core.userdetails.User(user1.getUsername()
-        , user1.getPassword(), authorities);
+    return new CustomUserDetails(userOptional.get());
   }
 }
