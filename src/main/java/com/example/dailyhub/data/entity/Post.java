@@ -58,6 +58,9 @@ public class Post {
   @Size(max = 10)
   private String tag3;
 
+  @Column(nullable = false)
+  private String image;
+
   @CreatedDate
   @Column(updatable = false)
   private LocalDateTime createdAt;
@@ -80,11 +83,6 @@ public class Post {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private List<Image> images = new ArrayList<>();
-
 
 
 }

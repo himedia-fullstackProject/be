@@ -20,10 +20,12 @@ public class PostDTO {
     private String tag1;
     private String tag2;
     private String tag3;
-    private List<LikesDTO> likes; // 필요시 LikesDTO를 정의
+    private List<LikesDTO> likes; // 필요 시 LikesDTO를 정의
     private Long mainCategoryId; // Main Category ID
     private Long subCategoryId; // Sub Category ID
-    private String username; // 작성자 정보
+    private UserDTO user; // UserDTO를 포함
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String userNickname;
+
 }
