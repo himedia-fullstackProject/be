@@ -41,6 +41,14 @@ public class PostService {
         SubCategory subCategory = subCategoryRepository.findById(postDTO.getSubCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("SubCategory not found with id: " + postDTO.getSubCategoryId()));
 
+        // 현재 로그인된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // 로그인된 사용자 이름
+
+        // 사용자 정보 가져오기
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
         return Post.builder()
                 .title(postDTO.getTitle())
                 .image(postDTO.getImage())
@@ -50,6 +58,7 @@ public class PostService {
                 .tag3(postDTO.getTag3())
                 .mainCategory(mainCategory)
                 .subCategory(subCategory)
+                .user(user) // 현재 사용자 설정
                 .build();
     }
 
@@ -70,9 +79,10 @@ public class PostService {
                 .tag3(post.getTag3())
                 .mainCategoryId(post.getMainCategory().getId())
                 .subCategoryId(post.getSubCategory().getId())
-                .user(userDTO)
+                .userId(post.getUser() != null ? post.getUser().getId() : null) // 사용자 ID 추가
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .userNickname(post.getUser() != null ? post.getUser().getNickname() : null) // 사용자 닉네임 추가
                 .build();
     }
 
@@ -83,16 +93,7 @@ public class PostService {
 
     // 포스트 생성
     public PostDTO createPost(PostDTO postDTO) {
-//        // 현재 로그인된 사용자 정보 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String username = authentication.getName(); // 로그인된 사용자 이름
-//
-//        // 사용자 정보 가져오기
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
-
         Post post = convertToEntity(postDTO);
-//        post.setUser(user); // 현재 사용자 설정
         post.setCreatedAt(LocalDateTime.now()); // 현재 시간 설정
         post.setUpdatedAt(LocalDateTime.now()); // 수정 시간도 현재 시간으로 설정
 
@@ -102,19 +103,16 @@ public class PostService {
 
     // 포스트 업데이트
     public PostDTO updatePost(Long postId, PostDTO postDTO) {
-        // 현재 로그인된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // 로그인된 사용자 이름
-
-        // 사용자 정보 가져오기
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
-
         // 수정할 포스트 가져오기
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
 
         // 포스트 작성자 확인
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // 로그인된 사용자 이름
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
         if (!post.getUser().getId().equals(user.getId()) && !user.getRole().equals("ADMIN")) {
             throw new AccessDeniedException("You do not have permission to edit this post");
         }
@@ -134,22 +132,20 @@ public class PostService {
 
     // 포스트 삭제
     public void deletePost(Long postId) {
-        // 현재 로그인된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // 로그인된 사용자 이름
-
-        // 사용자 정보 가져오기
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
-
         // 삭제할 포스트 가져오기
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
 
-        // 포스트 작성자 확인 또는 admin 권한 확인
-        if (!post.getUser().getId().equals(user.getId()) && !user.getRole().equals("ADMIN")) {
-            throw new AccessDeniedException("You do not have permission to delete this post");
-        }
+//        // 현재 로그인된 사용자 정보 가져오기
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName(); // 로그인된 사용자 이름
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+//
+//        // 포스트 작성자 확인 또는 admin 권한 확인
+//        if (!post.getUser().getId().equals(user.getId()) && !user.getRole().equals("ADMIN")) {
+//            throw new AccessDeniedException("You do not have permission to delete this post");
+//        }
 
         postRepository.delete(post);
     }

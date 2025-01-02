@@ -1,5 +1,6 @@
 package com.example.dailyhub.data.dto;
 
+import com.example.dailyhub.data.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class PostDTO {
     private List<LikesDTO> likes; // 필요 시 LikesDTO를 정의
     private Long mainCategoryId; // Main Category ID
     private Long subCategoryId; // Sub Category ID
-    private UserDTO user; // UserDTO를 포함
+    private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String userNickname;

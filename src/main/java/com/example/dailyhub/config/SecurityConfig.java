@@ -95,15 +95,15 @@ public class SecurityConfig {
     http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
         UsernamePasswordAuthenticationFilter.class);
 
-<<<<<<< HEAD
-=======
-    http.exceptionHandling(exception -> {
-          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
-          exception.accessDeniedHandler(customAccessDeniedHandler);
-        }
-    );
-
->>>>>>> 31045e548a1cb1303acf574440ee022e81d04b54
+//<<<<<<< HEAD
+//=======
+//    http.exceptionHandling(exception -> {
+//          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
+//          exception.accessDeniedHandler(customAccessDeniedHandler);
+//        }
+//    );
+//
+//>>>>>>> 31045e548a1cb1303acf574440ee022e81d04b54
     return http.build();
   }
 
