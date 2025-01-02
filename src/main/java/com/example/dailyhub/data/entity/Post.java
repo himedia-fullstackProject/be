@@ -1,5 +1,6 @@
 package com.example.dailyhub.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -84,5 +85,8 @@ public class Post {
   @JoinColumn(name = "user_id")
   private User user;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 31045e548a1cb1303acf574440ee022e81d04b54
 }
