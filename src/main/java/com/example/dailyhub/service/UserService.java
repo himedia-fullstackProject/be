@@ -32,4 +32,6 @@ public interface UserService {
                 .birthday(userDTO.getBirthday())
                 .build();
     }
+
+    UserDTO login(String username, String password); // 로그인 메서드 추가
 }
