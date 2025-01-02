@@ -85,8 +85,5 @@ public class Post {
   @JoinColumn(name = "user_id")
   private User user;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 31045e548a1cb1303acf574440ee022e81d04b54
 }

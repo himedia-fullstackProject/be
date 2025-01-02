@@ -17,7 +17,7 @@ public class SubCategoryService {
     private final SubCategoryRepository subCategoryRepository;
 
     public List<SubCategoryDTO> getSubCategoriesByMainCategory(Long mainCategoryId) {
-        return subCategoryRepository.findByMainCategoryId(mainCategoryId).stream()
+        return subCategoryRepository.findBySubCategoryId(mainCategoryId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
