@@ -1,6 +1,7 @@
 package com.example.dailyhub.service;
 
 
+import com.example.dailyhub.data.dto.PageResponse;
 import com.example.dailyhub.data.dto.PostDTO;
 import com.example.dailyhub.data.entity.Likes;
 import com.example.dailyhub.data.entity.Post;
@@ -39,12 +40,14 @@ public class LikesServiceImpl implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PostDTO> readLikesPostsByUser(User user, Pageable pageable) {
-        // 사용자가 좋아요 한 게시물
+    public PageResponse<PostDTO> readLikesPostsByUser(User user, Pageable pageable) {
         Page<Likes> likesPage = likesRepository.findByUser(user, pageable);
 
-        // Page<Likes> -> Page<PostDTO>
-        return likesPage.map(likes -> convertPostToDTO(likes.getPost()));
+        // Page<Likes>를 Page<PostDTO>로 변환
+        Page<PostDTO> postDTOPage = likesPage.map(likes -> convertPostToDTO(likes.getPost()));
+
+        // Page<PostDTO>를 PageResponse<PostDTO>로 변환
+        return new PageResponse<>(postDTOPage);
     }
 
     //post -> post dto

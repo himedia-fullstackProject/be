@@ -1,19 +1,19 @@
 package com.example.dailyhub.controller;
 
+import com.example.dailyhub.data.dto.PageResponse;
 import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.data.dto.PostDTO;
 import com.example.dailyhub.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -53,8 +53,8 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<PostDTO>> searchPosts(
+    @PostMapping ("/search")
+    public ResponseEntity<PageResponse<PostDTO>> searchPosts(
             @RequestParam(required = true) String searchTerm,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {
@@ -62,13 +62,14 @@ public class PostController {
             throw new IllegalArgumentException("검색어를 입력해주세요.");
         }
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> posts = postService.searchPosts(searchTerm, pageable);
-        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
-        return new ResponseEntity<>(postDTOs, HttpStatus.OK);
+        PageResponse<PostDTO> posts = postService.searchPosts(searchTerm, pageable);
+        return ResponseEntity.ok(posts);
+        //        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
+//        return new ResponseEntity<>(postDTOs, HttpStatus.OK);
     }
 
-    @GetMapping("/search/tag")
-    public ResponseEntity<Page<PostDTO>> searchPostsByTag(
+    @GetMapping ("/search/tag")
+    public HttpEntity<PageResponse<PostDTO>> searchPostsByTag(
             @RequestParam(required = true) String tag,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {
@@ -76,18 +77,19 @@ public class PostController {
             throw new IllegalArgumentException("태그를 입력해주세요.");
         }
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> tagPosts = postService.getAllHashTagSearchPosts(tag, pageable);
-        Page<PostDTO> tagPostDTOs = tagPosts.map(this::convertToDTO);
-        return new ResponseEntity<>(tagPostDTOs, HttpStatus.OK);
+        PageResponse<PostDTO> searchTagPosts = postService.getAllHashTagSearchPosts(tag, pageable);
+
+        return ResponseEntity.ok(searchTagPosts);
     }
 
+
     @GetMapping
-    public ResponseEntity<Page<PostDTO>> getAllPosts(@RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<PageResponse<Post>> getAllPosts(@RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> posts = postService.getAllPosts(pageable);
-        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
-        return new ResponseEntity<>(postDTOs, HttpStatus.OK);
+        PageResponse<Post> posts = postService.getAllPosts(pageable);
+
+        return ResponseEntity.ok(posts);
     }
 
     // Entity to DTO 변환 메서드 (likes는 포함하지 않음)

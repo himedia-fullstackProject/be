@@ -1,6 +1,7 @@
 package com.example.dailyhub.controller;
 
 
+import com.example.dailyhub.data.dto.PageResponse;
 import com.example.dailyhub.data.dto.PostDTO;
 import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.data.entity.User;
@@ -31,7 +32,7 @@ public class LikesController {
 
     //유저 별 좋아요 누른 포스트 조회 / 페이지 네이션
     @GetMapping("/{id}")
-    public ResponseEntity<Page<PostDTO>> getUserLikedPosts(
+    public ResponseEntity<PageResponse<PostDTO>> getUserLikedPosts(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page) {
         User user = userRepository.findById(id)
@@ -39,7 +40,7 @@ public class LikesController {
 
         // 페이지 당 포스트 갯수  6, 내림차순 정렬
         Pageable pageable = PageRequest.of(page, 6, Sort.by("post.createdAt").descending());
-        Page<PostDTO> likedPosts = likesService.readLikesPostsByUser(user, pageable);
+        PageResponse<PostDTO> likedPosts = likesService.readLikesPostsByUser(user, pageable);
 
         return ResponseEntity.ok(likedPosts);
     }

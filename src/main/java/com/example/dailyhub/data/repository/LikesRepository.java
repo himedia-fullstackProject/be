@@ -1,5 +1,6 @@
 package com.example.dailyhub.data.repository;
 
+import com.example.dailyhub.data.dto.PageResponse;
 import com.example.dailyhub.data.entity.Likes;
 import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.data.entity.User;
@@ -15,7 +16,6 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
 
   Optional<Likes> findByPostAndUser(Post post, User user);
 
-  Page<Likes> findAllByUserId(User user_id, Pageable pageable);
 
   Page<Likes> findByUser(User user, Pageable pageable);
 //유저아이디로 likes 엔티티 조회
