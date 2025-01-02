@@ -2,7 +2,7 @@ package com.example.dailyhub.config;
 
 import com.example.dailyhub.component.CustomAccessDeniedHandler;
 import com.example.dailyhub.component.CustomAuthenticationEntryPoint;
-import com.example.dailyhub.data.repository.UserRepository;
+
 import com.example.dailyhub.security.jwt.JwtFilter;
 import com.example.dailyhub.security.jwt.JwtUtil;
 import com.example.dailyhub.security.jwt.LoginFilter;
@@ -95,12 +95,6 @@ public class SecurityConfig {
 
     http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
         UsernamePasswordAuthenticationFilter.class);
-
-    http.exceptionHandling(exception -> {
-          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
-          exception.accessDeniedHandler(customAccessDeniedHandler);
-        }
-    );
 
     return http.build();
   }
