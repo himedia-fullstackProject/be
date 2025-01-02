@@ -76,7 +76,7 @@ public class Post {
   private SubCategory subCategory;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "username")
+  @JoinColumn(name = "user_id")
   private User user;
 
   @CreatedDate

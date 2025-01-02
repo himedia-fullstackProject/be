@@ -29,10 +29,9 @@ public class Likes {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long count;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "username")
+  @JoinColumn(name = "user_id")
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)

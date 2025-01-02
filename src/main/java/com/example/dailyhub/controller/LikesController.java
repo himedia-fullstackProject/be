@@ -15,12 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,7 +38,7 @@ public class LikesController {
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보 조회 실패"));
 
         // 페이지 당 포스트 갯수  6, 내림차순 정렬
-        Pageable pageable = PageRequest.of(page, 6, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, 6, Sort.by("post.createdAt").descending());
         Page<PostDTO> likedPosts = likesService.readLikesPostsByUser(user, pageable);
 
         return ResponseEntity.ok(likedPosts);
@@ -51,17 +46,17 @@ public class LikesController {
 
 
     @PostMapping //좋아요 추가&취소
-    public void changeLikes(@RequestBody PostDTO postDTO) {
-        String username = postDTO.getUsername();
-        Long postId = postDTO.getId();
+    public ResponseEntity<String> changeLikes(@RequestBody PostDTO postDTO) {
 // postDTO 에서 유저 정보 가져오기
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(postDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보 조회 실패"));
 //
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findById(postDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("포스트 조회 실패"));
 
-        likesService.changeLikes(user, post);
+        boolean isLiked = likesService.changeLikes(user, post);
+
+        return ResponseEntity.ok(isLiked ? "좋아요 추가됨" : "좋아요 취소됨");
     }
 }
 

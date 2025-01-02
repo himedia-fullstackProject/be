@@ -14,10 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -45,7 +41,7 @@ public class LikesServiceImpl implements LikesService {
     @Transactional(readOnly = true)
     public Page<PostDTO> readLikesPostsByUser(User user, Pageable pageable) {
         // 사용자가 좋아요 한 게시물
-        Page<Likes> likesPage = likesRepository.findAllByUser(user, pageable);
+        Page<Likes> likesPage = likesRepository.findByUser(user, pageable);
 
         // Page<Likes> -> Page<PostDTO>
         return likesPage.map(likes -> convertPostToDTO(likes.getPost()));
@@ -62,7 +58,7 @@ public class LikesServiceImpl implements LikesService {
                 .tag3(post.getTag3())
                 .mainCategoryId(post.getMainCategory().getId())
                 .subCategoryId(post.getSubCategory().getId())
-                .username(post.getUser().getUsername()) // 작성자 정보 추가
+                .userId(post.getUser().getId()) // 작성자 정보 추가
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
@@ -70,23 +66,24 @@ public class LikesServiceImpl implements LikesService {
 
 
     @Override
-    public void changeLikes(User user , Post post) {
+    public boolean changeLikes(User user, Post post) {
         boolean exists = likesRepository.existsByUserAndPost(user, post);
-               //존재하면 true , 존재하지 않으면 false
+        //존재하면 true , 존재하지 않으면 false
         if (exists) {
-            Likes likes = likesRepository.findByPostAndUser(post, user)
-                    .orElseThrow(() -> new IllegalArgumentException("좋아요를 찾을 수 없습니다."));
+            likesRepository.findByPostAndUser(post, user)
+                    .ifPresent(likes -> {
+                        likesRepository.delete(likes);
+                    });
 
-            likesRepository.delete(likes);
+            return false;
         } else {
             Likes newLike = Likes.builder()
                     .user(user)
                     .post(post)
-                    .count(1L)
                     .build();
 
             likesRepository.save(newLike);
-
+            return true;
         }
     }
 

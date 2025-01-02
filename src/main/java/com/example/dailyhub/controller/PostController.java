@@ -103,7 +103,7 @@ public class PostController {
                 // likes는 포함하지 않음
                 .mainCategoryId(post.getMainCategory() != null ? post.getMainCategory().getId() : null)
                 .subCategoryId(post.getSubCategory() != null ? post.getSubCategory().getId() : null)
-                .username(post.getUser() != null ? post.getUser().getUsername() : null)
+                .userId(post.getUser().getId() != null ? post.getUser().getId() : null)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

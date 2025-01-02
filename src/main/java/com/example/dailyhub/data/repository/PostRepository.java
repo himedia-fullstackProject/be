@@ -20,6 +20,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> searchPosts(@Param("searchTerm") String searchTerm , Pageable pageable);
 
 
-    @Query("SELECT p FROM Post p WHERE p.tag1 = :tag OR p.tag2 = :tag OR p.tag3 = :tag")
+    @Query("SELECT p FROM Post p WHERE " +
+            "LOWER(p.tag1) LIKE LOWER(CONCAT('%', :tag, '%')) OR " +
+            "LOWER(p.tag2) LIKE LOWER(CONCAT('%', :tag, '%')) OR " +
+            "LOWER(p.tag3) LIKE LOWER(CONCAT('%', :tag, '%'))")
     Page<Post> findPostsByHashtags(@Param("tag") String tag , Pageable pageable);
 } // 해쉬태그 검색
