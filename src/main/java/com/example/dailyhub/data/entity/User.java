@@ -76,4 +76,8 @@ public class User {
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
   @Builder.Default
   private List<Likes> likes = new ArrayList<>();
+
 }
+
+
+
