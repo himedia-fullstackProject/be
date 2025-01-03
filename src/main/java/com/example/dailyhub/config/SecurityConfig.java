@@ -59,7 +59,7 @@ public class SecurityConfig {
         .formLogin(formLogin -> formLogin.disable())
         .httpBasic(httpBasic -> httpBasic.disable())
         .authorizeHttpRequests(authorize ->
-            authorize.requestMatchers("/api/users/join", "/api/users/id", "/api/users/check",
+            authorize.requestMatchers("/","/api/users/join", "/api/users/id", "/api/users/check",
                     "/api/login", "/api/logout", "/api/posts/{id}", "/api/posts/search",
                     "/api/posts/search/tag")
                 .permitAll()
