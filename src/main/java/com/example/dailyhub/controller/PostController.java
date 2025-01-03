@@ -91,12 +91,19 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<PageResponse<PostDTO>> getAllPosts(
-            @RequestParam String username,
+            @RequestParam(required = false) String username,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        PageResponse<PostDTO> posts = postService.getAllPosts(username, pageable);
 
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 수정된 메소드 호출
+        PageResponse<PostDTO> posts = postService.getAllPosts(username, pageable);
         return ResponseEntity.ok(posts);
     }
+
+
+
 }
+g
