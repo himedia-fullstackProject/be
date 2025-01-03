@@ -29,79 +29,83 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final JwtUtil jwtUtil;
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+  private final AuthenticationConfiguration authenticationConfiguration;
+  private final JwtUtil jwtUtil;
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
+  }
 
-    @Bean
-    public LogoutSuccessHandler logoutHandler() {
-        return (request, response, authentication) -> {
-            response.setStatus(HttpStatus.OK.value());
-            response.getWriter().write("logout success");
-        };
-    }
+  @Bean
+  public LogoutSuccessHandler logoutHandler() {
+    return (request, response, authentication) -> {
+      response.setStatus(HttpStatus.OK.value());
+      response.getWriter().write("logout success");
+    };
+  }
 
-    @Bean
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .formLogin(formLogin -> formLogin.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/**")
-                                .permitAll()
-                                .requestMatchers("/").hasAnyRole("ADMIN")
-                                .anyRequest().authenticated()
-                );
-
-        http.cors(cors -> cors.configurationSource(request -> {
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowCredentials(true);
-            config.setAllowedOrigins(
-                    Arrays.asList("http://localhost:3000", "http://localhost:3001",
-                            "http://localhost:3002")
-            );
-            config.addAllowedHeader("*");
-            config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-            config.addExposedHeader("Authorization");
-            return config;
-        }));
-
-        http.logout(logout ->
-                logout.logoutUrl("/logout")
-                        .logoutSuccessHandler(logoutHandler())
-                        .addLogoutHandler((request, response, authentication) -> {
-                            if (request.getSession() != null) {
-                                request.getSession().invalidate();
-                            }
-                        })
-                        .deleteCookies("JSESSIONID", "Authorization", "access", "refresh", "token")
+  @Bean
+  public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    http.csrf(csrf -> csrf.disable())
+        .formLogin(formLogin -> formLogin.disable())
+        .httpBasic(httpBasic -> httpBasic.disable())
+        .authorizeHttpRequests(authorize ->
+            authorize.requestMatchers("/api/users/join", "/api/users/id", "/api/users/check",
+                    "/api/login", "/api/logout", "/api/posts/{id}", "/api/posts/search",
+                    "/api/posts/search/tag")
+                .permitAll()
+                .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
+                .anyRequest().authenticated()
         );
 
-        http.sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.cors(cors -> cors.configurationSource(request -> {
+      CorsConfiguration config = new CorsConfiguration();
+      config.setAllowCredentials(true);
+      config.setAllowedOrigins(
+          Arrays.asList("http://localhost:3000", "http://localhost:3001",
+              "http://localhost:3002")
+      );
+      config.addAllowedHeader("*");
+      config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+      config.addExposedHeader("Authorization");
+      return config;
+    }));
 
-        http.addFilterBefore(new JwtFilter(this.jwtUtil), LoginFilter.class);
+    http.logout(logout ->
+        logout.logoutUrl("/logout")
+            .logoutSuccessHandler(logoutHandler())
+            .addLogoutHandler((request, response, authentication) -> {
+              if (request.getSession() != null) {
+                request.getSession().invalidate();
+              }
+            })
+            .deleteCookies("JSESSIONID", "Authorization", "access", "refresh", "token")
+    );
 
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-                UsernamePasswordAuthenticationFilter.class);
+    http.sessionManagement(session ->
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.exceptionHandling(exception -> {
-                    exception.authenticationEntryPoint(customAuthenticationEntryPoint);
-                    exception.accessDeniedHandler(customAccessDeniedHandler);
-                }
-        );
+    http.addFilterBefore(new JwtFilter(this.jwtUtil), LoginFilter.class);
 
-        return http.build();
-    }
+    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
+        UsernamePasswordAuthenticationFilter.class);
+
+    http.exceptionHandling(exception -> {
+          exception.authenticationEntryPoint(customAuthenticationEntryPoint);
+          exception.accessDeniedHandler(customAccessDeniedHandler);
+        }
+    );
+
+    return http.build();
+  }
 
 }
