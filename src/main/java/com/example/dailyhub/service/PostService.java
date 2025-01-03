@@ -71,7 +71,7 @@ public class PostService {
                 .userId(post.getUser() != null ? post.getUser().getId() : null)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
-                .userNickname(post.getUser() != null ? post.getUser().getNickname() : null)
+                .userNickname(post.getUser().getNickname())
                 .build();
     }
 
