@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.example.dailyhub.data.dto.PageResponse;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -104,13 +106,10 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public List<PostDTO> searchPosts(String searchTerm, Long mainCategoryId, Long subCategoryId, String searchType) {
-        List<Post> posts = postRepository.searchPosts(searchTerm, mainCategoryId, subCategoryId, searchType);
-        return posts.stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    public Page<PostDTO> getAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).map(this::convertToDTO);
+    public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm, Long mainCategoryId, Long subCategoryId, String searchType, Pageable pageable) {
+        Page<Post> posts = postRepository.searchPosts(searchTerm, mainCategoryId, subCategoryId, searchType, pageable);
+        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
+        return new PageResponse<>(postDTOs);
     }
 
     private User getCurrentUser() {
@@ -136,4 +135,20 @@ public class PostService {
         post.setTag3(postDTO.getTag3());
         post.setUpdatedAt(LocalDateTime.now()); // 수정 시간 업데이트
     }
+
+    public PageResponse<PostDTO> getAllPosts(String username, Pageable pageable) {
+        Long userId = userRepository.findUserIdByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
+        Page<Post> allPosts = postRepository.getAllPostByUserId(userId, pageable);
+        Page<PostDTO> postDTOs = allPosts.map(this::convertToDTO); // Post를 PostDTO로 변환
+        return new PageResponse<>(postDTOs); // PageResponse<PostDTO>를 반환
+    }
+
+    public PageResponse<PostDTO> getAllHashTagSearchPosts(String tag, Pageable pageable) {
+        Page<Post> tagSearchResultPost = postRepository.findPostsByHashtags(tag, pageable);
+        Page<PostDTO> postDTOPage = tagSearchResultPost.map(this::convertToDTO);
+        return new PageResponse<>(postDTOPage);
+    } // 헤쉬태그 검색 페이지 네이션
 }
+

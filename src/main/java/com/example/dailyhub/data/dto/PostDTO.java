@@ -1,6 +1,5 @@
 package com.example.dailyhub.data.dto;
 
-import com.example.dailyhub.data.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
