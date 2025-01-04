@@ -59,8 +59,8 @@ public class SecurityConfig {
         .formLogin(formLogin -> formLogin.disable())
         .httpBasic(httpBasic -> httpBasic.disable())
         .authorizeHttpRequests(authorize ->
-            authorize.requestMatchers("/","/api/users/join", "/api/users/id", "/api/users/check",
-                    "/api/login", "/api/logout", "/api/posts/{id}", "/api/posts/search",
+            authorize.requestMatchers("/", "/api/users/join", "/api/users/id", "/api/users/check",
+                    "/login", "/logout", "/api/posts/{id}", "/api/posts/search","/reissue",
                     "/api/posts/search/tag")
                 .permitAll()
                 .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
