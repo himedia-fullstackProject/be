@@ -19,3 +19,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<String> findByUserId(@Param("id") Long id);
 
 }
+
