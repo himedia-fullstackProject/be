@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/posts/likes")
+@RequestMapping("/api/likes")
 @Slf4j
 
 
@@ -31,16 +31,16 @@ public class LikesController {
     private final LikesRepository likesRepository;
 
     //유저 별 좋아요 누른 포스트 조회 / 페이지 네이션
-    @GetMapping("/{id}")
+    @GetMapping("/{username}")
     public ResponseEntity<PageResponse<PostDTO>> getUserLikedPosts(
-            @PathVariable Long id,
+            @PathVariable String username,
             @RequestParam(defaultValue = "0") int page) {
-        User user = userRepository.findById(id)
+        Long userId = userRepository.findUserIdByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보 조회 실패"));
 
         // 페이지 당 포스트 갯수  6, 내림차순 정렬
         Pageable pageable = PageRequest.of(page, 6, Sort.by("post.createdAt").descending());
-        PageResponse<PostDTO> likedPosts = likesService.readLikesPostsByUser(user, pageable);
+        PageResponse<PostDTO> likedPosts = likesService.readLikesPostsByUser(userId, pageable);
 
         return ResponseEntity.ok(likedPosts);
     }
