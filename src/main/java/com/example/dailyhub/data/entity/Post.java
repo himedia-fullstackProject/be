@@ -44,7 +44,7 @@ public class Post {
   private String title;
 
   @Column(nullable = true)
-  @Size(min = 5, max = 200)
+  @Size(min = 5)
   private String description;
 
   @Column(nullable = true)

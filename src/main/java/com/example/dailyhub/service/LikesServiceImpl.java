@@ -40,8 +40,9 @@ public class LikesServiceImpl implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<PostDTO> readLikesPostsByUser(User user, Pageable pageable) {
-        Page<Likes> likesPage = likesRepository.findByUser(user, pageable);
+    public PageResponse<PostDTO> readLikesPostsByUser(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId).orElse(null);
+        Page<Likes> likesPage = likesRepository.findByUser(user,pageable);
 
         // Page<Likes>를 Page<PostDTO>로 변환
         Page<PostDTO> postDTOPage = likesPage.map(likes -> convertPostToDTO(likes.getPost()));
@@ -52,22 +53,22 @@ public class LikesServiceImpl implements LikesService {
 
     //post -> post dto
     private PostDTO convertPostToDTO(Post post) {
-        String userNickname = userRepository.findByUserId(post.getUser().getId())
-            .orElseThrow(()->new RuntimeException("유저 닉네임 조회 실패"));
+        String username = userRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("유저 닉네임 조회 실패"));
         return PostDTO.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .description(post.getDescription())
-            .tag1(post.getTag1())
-            .tag2(post.getTag2())
-            .tag3(post.getTag3())
-            .mainCategoryId(post.getMainCategory().getId())
-            .subCategoryId(post.getSubCategory().getId())
-            .userId(post.getUser().getId()) // 작성자 정보 추가
-            .userNickname(userNickname)
-            .createdAt(post.getCreatedAt())
-            .updatedAt(post.getUpdatedAt())
-            .build();
+                .id(post.getId())
+                .title(post.getTitle())
+                .description(post.getDescription())
+                .tag1(post.getTag1())
+                .tag2(post.getTag2())
+                .tag3(post.getTag3())
+                .mainCategoryId(post.getMainCategory().getId())
+                .subCategoryId(post.getSubCategory().getId())
+                .userId(post.getUser().getId()) // 작성자 정보 추가
+                .username(username)
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
     }
 
     @Override

@@ -20,6 +20,7 @@ public class PageResponse<T>{
 
     public PageResponse(Page<T> page) {
         this.content = page.getContent();
+        this.totalPosts = (int)page.getTotalElements();
         this.totalPages = page.getTotalPages();
         this.nowPage = page.getNumber();
         this.size = page.getSize();

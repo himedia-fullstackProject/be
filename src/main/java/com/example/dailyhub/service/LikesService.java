@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface LikesService {
-    public PageResponse<PostDTO> readLikesPostsByUser(User user , Pageable pageable);
+    public PageResponse<PostDTO> readLikesPostsByUser(Long userId , Pageable pageable);
 
     public boolean changeLikes(User user, Post post);
 
