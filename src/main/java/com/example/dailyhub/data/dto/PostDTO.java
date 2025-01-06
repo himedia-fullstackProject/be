@@ -26,6 +26,6 @@ public class PostDTO {
     private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String userNickname;
+    private String username;
 
 }

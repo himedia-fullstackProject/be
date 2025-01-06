@@ -57,8 +57,8 @@ public class PostService {
                 .build();
     }
 
-    private PostDTO convertToDTO(Post post) {
-        return PostDTO.builder()
+    private PostDTO convertToDTO(Post post, boolean includeUser) {
+        PostDTO.PostDTOBuilder builder = PostDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .image(post.getImage())
@@ -66,26 +66,38 @@ public class PostService {
                 .tag1(post.getTag1())
                 .tag2(post.getTag2())
                 .tag3(post.getTag3())
-                .mainCategoryId(post.getMainCategory().getId())
-                .subCategoryId(post.getSubCategory().getId())
-                .userId(post.getUser() != null ? post.getUser().getId() : null)
+                .mainCategoryId(post.getMainCategory() != null ? post.getMainCategory().getId() : null)
+                .subCategoryId(post.getSubCategory() != null ? post.getSubCategory().getId() : null)
                 .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .userNickname(post.getUser().getNickname())
-                .build();
+                .updatedAt(post.getUpdatedAt());
+
+        if (includeUser) {
+            // 유저 정보를 포함할 경우
+            String username = post.getUser() != null ?
+                    userRepository.findByUserId(post.getUser().getId())
+                            .orElse("유저 정보 없음") : "유저 정보 없음";
+            builder.userId(post.getUser() != null ? post.getUser().getId() : null)
+                    .username(username);
+        } else {
+            // 유저 정보를 포함하지 않을 경우
+            builder.userId(null)
+                    .username("정보 없음"); // 유저 정보가 필요 없는 경우
+        }
+
+        return builder.build();
     }
 
     @Transactional
     public Optional<PostDTO> getPostById(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
-        return Optional.of(convertToDTO(post));
+        return Optional.of(convertToDTO(post, true)); // 유저 정보를 포함하여 반환
     }
 
     public PostDTO createPost(PostDTO postDTO) {
         Post post = convertToEntity(postDTO);
         Post savedPost = postRepository.save(post);
-        return convertToDTO(savedPost);
+        return convertToDTO(savedPost, true); // 유저 정보를 포함하여 반환
     }
 
     public PostDTO updatePost(Long postId, PostDTO postDTO) {
@@ -96,7 +108,7 @@ public class PostService {
         updatePostDetails(post, postDTO); // 포스트 세부정보 업데이트
 
         Post updatedPost = postRepository.save(post);
-        return convertToDTO(updatedPost);
+        return convertToDTO(updatedPost, true); // 유저 정보를 포함하여 반환
     }
 
     public void deletePost(Long postId) {
@@ -108,7 +120,7 @@ public class PostService {
 
     public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm, Long mainCategoryId, Long subCategoryId, String searchType, Pageable pageable) {
         Page<Post> posts = postRepository.searchPosts(searchTerm, mainCategoryId, subCategoryId, searchType, pageable);
-        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
+        Page<PostDTO> postDTOs = posts.map(post -> convertToDTO(post, true)); // 유저 정보 포함
         return new PageResponse<>(postDTOs);
     }
 
@@ -141,21 +153,20 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
 
         Page<Post> allPosts = postRepository.getAllPostByUserId(userId, pageable);
-        Page<PostDTO> postDTOs = allPosts.map(this::convertToDTO); // Post를 PostDTO로 변환
-        return new PageResponse<>(postDTOs); // PageResponse<PostDTO>를 반환
+        Page<PostDTO> postDTOs = allPosts.map(post -> convertToDTO(post, true)); // 유저 정보 포함
+        return new PageResponse<>(postDTOs);
     }
 
     public PageResponse<PostDTO> getAllHashTagSearchPosts(String tag, Pageable pageable) {
         Page<Post> tagSearchResultPost = postRepository.findPostsByHashtags(tag, pageable);
-        Page<PostDTO> postDTOPage = tagSearchResultPost.map(this::convertToDTO);
+        Page<PostDTO> postDTOPage = tagSearchResultPost.map(post -> convertToDTO(post, false)); // 유저 정보 비포함
         return new PageResponse<>(postDTOPage);
-    } // 헤쉬태그 검색 페이지 네이션
-
-    public PageResponse<PostDTO> getAllPost(Pageable pageable) {
-        Page<Post> allPosts = postRepository.findAll(pageable);
-        Page<PostDTO> postDTOs = allPosts.map(this::convertToDTO);
-        return new PageResponse<>(postDTOs);
     }
 
-}
+    public PageResponse<PostDTO> getAllPost(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable); // Page<Post>를 가져옴
+        return new PageResponse<>(posts.map(post -> convertToDTO(post, false))); // Post를 PostDTO로 변환 후 PageResponse에 전달
+    }
 
+
+}
