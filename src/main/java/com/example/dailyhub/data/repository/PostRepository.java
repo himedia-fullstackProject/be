@@ -40,11 +40,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUserId(Long userId);
 
     // 해시태그 검색 메서드
-    @Query("SELECT p FROM Post p WHERE " +
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN FETCH p.user u " +
+            "LEFT JOIN FETCH p.mainCategory mc "+
+            "LEFT JOIN FETCH p.subCategory sc WHERE "+
             "LOWER(p.tag1) LIKE LOWER(CONCAT('%', :tag, '%')) OR " +
             "LOWER(p.tag2) LIKE LOWER(CONCAT('%', :tag, '%')) OR " +
             "LOWER(p.tag3) LIKE LOWER(CONCAT('%', :tag, '%'))")
     Page<Post> findPostsByHashtags(@Param("tag") String tag, Pageable pageable);
+
 
     @Query("SELECT p FROM Post p WHERE p.user.id = :userId")
     Page<Post> getAllPostByUserId(@Param("user_id") Long userId, Pageable pageable);

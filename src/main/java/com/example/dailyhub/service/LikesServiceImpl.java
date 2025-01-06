@@ -52,19 +52,22 @@ public class LikesServiceImpl implements LikesService {
 
     //post -> post dto
     private PostDTO convertPostToDTO(Post post) {
+        String userNickname = userRepository.findByUserId(post.getUser().getId())
+            .orElseThrow(()->new RuntimeException("유저 닉네임 조회 실패"));
         return PostDTO.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .description(post.getDescription())
-                .tag1(post.getTag1())
-                .tag2(post.getTag2())
-                .tag3(post.getTag3())
-                .mainCategoryId(post.getMainCategory().getId())
-                .subCategoryId(post.getSubCategory().getId())
-                .userId(post.getUser().getId()) // 작성자 정보 추가
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .build();
+            .id(post.getId())
+            .title(post.getTitle())
+            .description(post.getDescription())
+            .tag1(post.getTag1())
+            .tag2(post.getTag2())
+            .tag3(post.getTag3())
+            .mainCategoryId(post.getMainCategory().getId())
+            .subCategoryId(post.getSubCategory().getId())
+            .userId(post.getUser().getId()) // 작성자 정보 추가
+            .userNickname(userNickname)
+            .createdAt(post.getCreatedAt())
+            .updatedAt(post.getUpdatedAt())
+            .build();
     }
 
 

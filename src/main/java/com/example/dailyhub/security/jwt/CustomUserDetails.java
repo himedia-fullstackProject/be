@@ -1,5 +1,7 @@
 package com.example.dailyhub.security.jwt;
 
+import com.example.dailyhub.data.entity.Likes;
+import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.data.entity.User;
 import java.time.LocalDate;
 import java.util.Collection;

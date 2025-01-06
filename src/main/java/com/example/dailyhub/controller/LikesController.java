@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/posts/likes")
+@RequestMapping("/api/likes")
 @Slf4j
 
 

@@ -77,6 +77,25 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    private PostDTO convertToDTO(Post post) {
+        return PostDTO.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .image(post.getImage())
+                .description(post.getDescription())
+                .tag1(post.getTag1())
+                .tag2(post.getTag2())
+                .tag3(post.getTag3())
+                .mainCategoryId(post.getMainCategory().getId())
+                .subCategoryId(post.getSubCategory().getId())
+                .userId(post.getUser() != null ? post.getUser().getId() : null)
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .userNickname(post.getUser().getNickname())
+                .build();
+    }
+
+    @Transactional
     public Optional<PostDTO> getPostById(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
