@@ -1,6 +1,6 @@
 package com.example.dailyhub.service;
 
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import com.example.dailyhub.data.dto.PostDTO;
 import com.example.dailyhub.data.entity.MainCategory;
@@ -20,7 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.example.dailyhub.data.dto.PageResponse;
 
@@ -33,27 +35,6 @@ public class PostService {
     private final SubCategoryRepository subCategoryRepository;
     private final UserRepository userRepository;
 
-    // 포스트를 DTO로 변환
-    private PostDTO convertToDTO(Post post) {
-        User user = post.getUser(); // Lazy loading을 방지하기 위해 초기화
-        return PostDTO.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .image(post.getImage())
-                .description(post.getDescription())
-                .tag1(post.getTag1())
-                .tag2(post.getTag2())
-                .tag3(post.getTag3())
-                .mainCategoryId(post.getMainCategory().getId())
-                .subCategoryId(post.getSubCategory().getId())
-                .userId(user != null ? user.getId() : null)
-                .userNickname(user != null ? user.getNickname() : null)
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .build();
-    }
-
-    // 포스트를 엔티티로 변환
     private Post convertToEntity(PostDTO postDTO) {
         MainCategory mainCategory = mainCategoryRepository.findById(postDTO.getMainCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("MainCategory not found with id: " + postDTO.getMainCategoryId()));
@@ -76,7 +57,6 @@ public class PostService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
     private PostDTO convertToDTO(Post post) {
         return PostDTO.builder()
                 .id(post.getId())
@@ -102,14 +82,12 @@ public class PostService {
         return Optional.of(convertToDTO(post));
     }
 
-    @Transactional
     public PostDTO createPost(PostDTO postDTO) {
         Post post = convertToEntity(postDTO);
         Post savedPost = postRepository.save(post);
         return convertToDTO(savedPost);
     }
 
-    @Transactional
     public PostDTO updatePost(Long postId, PostDTO postDTO) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
@@ -128,28 +106,10 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public PageResponse<PostDTO> getAllPosts(String username, Pageable pageable) {
-        Page<Post> allPosts;
-
-        if (username != null && !username.isEmpty()) {
-            Long userId = userRepository.findUserIdByUsername(username)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
-            allPosts = postRepository.getAllPostByUserId(userId, pageable);
-        } else {
-            allPosts = postRepository.findAll(pageable);
-        }
-
-        return new PageResponse<>(allPosts.map(this::convertToDTO)); // DTO로 변환하여 반환
-    }
-
     public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm, Long mainCategoryId, Long subCategoryId, String searchType, Pageable pageable) {
         Page<Post> posts = postRepository.searchPosts(searchTerm, mainCategoryId, subCategoryId, searchType, pageable);
-        return new PageResponse<>(posts.map(this::convertToDTO));
-    }
-
-    public PageResponse<PostDTO> getAllHashTagSearchPosts(String tag, Pageable pageable) {
-        Page<Post> tagSearchResultPost = postRepository.findPostsByHashtags(tag, pageable);
-        return new PageResponse<>(tagSearchResultPost.map(this::convertToDTO));
+        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
+        return new PageResponse<>(postDTOs);
     }
 
     private User getCurrentUser() {
@@ -175,4 +135,27 @@ public class PostService {
         post.setTag3(postDTO.getTag3());
         post.setUpdatedAt(LocalDateTime.now()); // 수정 시간 업데이트
     }
+
+    public PageResponse<PostDTO> getAllPosts(String username, Pageable pageable) {
+        Long userId = userRepository.findUserIdByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
+        Page<Post> allPosts = postRepository.getAllPostByUserId(userId, pageable);
+        Page<PostDTO> postDTOs = allPosts.map(this::convertToDTO); // Post를 PostDTO로 변환
+        return new PageResponse<>(postDTOs); // PageResponse<PostDTO>를 반환
+    }
+
+    public PageResponse<PostDTO> getAllHashTagSearchPosts(String tag, Pageable pageable) {
+        Page<Post> tagSearchResultPost = postRepository.findPostsByHashtags(tag, pageable);
+        Page<PostDTO> postDTOPage = tagSearchResultPost.map(this::convertToDTO);
+        return new PageResponse<>(postDTOPage);
+    } // 헤쉬태그 검색 페이지 네이션
+
+    public PageResponse<PostDTO> getAllPost(Pageable pageable) {
+        Page<Post> allPosts = postRepository.findAll(pageable);
+        Page<PostDTO> postDTOs = allPosts.map(this::convertToDTO);
+        return new PageResponse<>(postDTOs);
+    }
+
 }
+
