@@ -150,5 +150,12 @@ public class PostService {
         Page<PostDTO> postDTOPage = tagSearchResultPost.map(this::convertToDTO);
         return new PageResponse<>(postDTOPage);
     } // 헤쉬태그 검색 페이지 네이션
+
+    public PageResponse<PostDTO> getAllPost(Pageable pageable) {
+        Page<Post> allPosts = postRepository.findAll(pageable);
+        Page<PostDTO> postDTOs = allPosts.map(this::convertToDTO);
+        return new PageResponse<>(postDTOs);
+    }
+
 }
 

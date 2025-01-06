@@ -31,6 +31,7 @@ public class PostController {
 
     /**
      * Post detail 보는 메서드
+     *
      * @param id
      * @return id 값에 해당하는 post 정보
      */
@@ -44,6 +45,7 @@ public class PostController {
 
     /**
      * 글 작성
+     *
      * @param postDTO
      * @return 포스트 저장 상태
      */
@@ -59,6 +61,7 @@ public class PostController {
 
     /**
      * 글 수정
+     *
      * @param id
      * @param postDTO
      * @return 포스트 수정 상태
@@ -72,6 +75,7 @@ public class PostController {
 
     /**
      * 글 삭제
+     *
      * @param id
      * @return 포스트 삭제 상태
      */
@@ -84,6 +88,7 @@ public class PostController {
 
     /**
      * 검색 기능
+     *
      * @param searchTerm
      * @param mainCategoryId
      * @param subCategoryId
@@ -105,7 +110,7 @@ public class PostController {
             throw new IllegalArgumentException("검색어를 입력해주세요.");
         }
         Pageable pageable = PageRequest.of(page, size);
-        PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(searchTerm,mainCategoryId,subCategoryId,searchType, pageable);
+        PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(searchTerm, mainCategoryId, subCategoryId, searchType, pageable);
         return ResponseEntity.ok(posts);
         //        Page<PostDTO> postDTOs = posts.map(this::convertToDTO);
 //        return new ResponseEntity<>(postDTOs, HttpStatus.OK);
@@ -113,6 +118,7 @@ public class PostController {
 
     /**
      * 태그 검색
+     *
      * @param tag
      * @param page
      * @param size
@@ -135,6 +141,7 @@ public class PostController {
 
     /**
      * 유저 별 작성 글 가져오기
+     *
      * @param username
      * @param page
      * @param size
@@ -151,4 +158,21 @@ public class PostController {
 
         return ResponseEntity.ok(posts);
     }
+
+    /**
+     * 전체 포스트 조회
+     * @param page
+     * @param size
+     * @return 전체 포스트 페이지네이션 정보
+     */
+    @PreAuthorize("permitAll()")
+    @GetMapping("/all")
+    public ResponseEntity<PageResponse<PostDTO>> getAllPost(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<PostDTO> posts = postService.getAllPost(pageable);
+        return ResponseEntity.ok(posts);
+    }
+
 }

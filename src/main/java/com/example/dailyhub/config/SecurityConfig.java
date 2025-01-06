@@ -60,8 +60,8 @@ public class SecurityConfig {
         .httpBasic(httpBasic -> httpBasic.disable())
         .authorizeHttpRequests(authorize ->
             authorize.requestMatchers("/","/api/users/join", "/api/users/id", "/api/users/check",
-                    "/api/login", "/api/logout", "/api/posts/{id}", "/api/posts/search",
-                    "/api/posts/search/tag")
+                    "/api/login", "/api/logout", "/api/posts/**", "/api/posts/search",
+                    "/api/posts/search/tag", "/api/posts/all", "/api/reissue")
                 .permitAll()
                 .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
                 .anyRequest().authenticated()
