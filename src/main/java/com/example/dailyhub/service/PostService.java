@@ -165,7 +165,7 @@ public class PostService {
 
     public PageResponse<PostDTO> getAllPost(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable); // Page<Post>를 가져옴
-        return new PageResponse<>(posts.map(post -> convertToDTO(post, false))); // Post를 PostDTO로 변환 후 PageResponse에 전달
+        return new PageResponse<>(posts.map(post -> convertToDTO(post, true))); // Post를 PostDTO로 변환 후 PageResponse에 전달
     }
 
 
