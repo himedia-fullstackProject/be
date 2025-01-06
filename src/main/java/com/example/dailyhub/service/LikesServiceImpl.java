@@ -70,7 +70,6 @@ public class LikesServiceImpl implements LikesService {
             .build();
     }
 
-
     @Override
     public boolean changeLikes(User user, Post post) {
         boolean exists = likesRepository.existsByUserAndPost(user, post);
