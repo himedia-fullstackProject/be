@@ -24,6 +24,7 @@ public class PostController {
 
     private final PostService postService;
 
+
     /**
      * Post detail 보는 메서드
      *
