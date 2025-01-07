@@ -73,7 +73,7 @@ public class SecurityConfig {
       config.setAllowCredentials(true);
       config.setAllowedOrigins(
           Arrays.asList("http://localhost:3000", "http://localhost:3001",
-              "http://localhost:3002", "https://**")
+              "http://localhost:3002", "http://localhost","http://15.164.52.27","http://15.164.52.27:80")
       );
       config.addAllowedHeader("*");
       config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
