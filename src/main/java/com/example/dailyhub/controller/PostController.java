@@ -141,7 +141,7 @@ public class PostController {
     public ResponseEntity<PageResponse<PostDTO>> getAllPosts(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "6") int size) {
         Pageable pageable = PageRequest.of(page, size);
         PageResponse<PostDTO> posts = postService.getAllPosts(username, pageable);
 

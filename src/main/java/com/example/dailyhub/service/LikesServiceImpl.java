@@ -38,12 +38,19 @@ public class LikesServiceImpl implements LikesService {
 //
 //    }
 
+
+    //aggregator, facade 패턴 공부
+    // @Transactional 공부
+    // 구현 해서 타 서비스 조회 부분 분리
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<PostDTO> readLikesPostsByUser(Long userId, Pageable pageable) {
+    public PageResponse<PostDTO> readLikesPostsByUser(final Long userId, final Pageable pageable) {
         User user = userRepository.findById(userId).orElse(null);
+        // 얘도 서비스
         Page<Likes> likesPage = likesRepository.findByUser(user,pageable);
 
+
+        // DTO 변환은 서비스 마지막에서 구현 컨트롤러는 서비스 통신 및
         // Page<Likes>를 Page<PostDTO>로 변환
         Page<PostDTO> postDTOPage = likesPage.map(likes -> convertPostToDTO(likes.getPost()));
 
@@ -74,6 +81,7 @@ public class LikesServiceImpl implements LikesService {
     @Override
     public boolean changeLikes(User user, Post post) {
         boolean exists = likesRepository.existsByUserAndPost(user, post);
+        //얼리 리턴 하세요.
         //존재하면 true , 존재하지 않으면 false
         if (exists) {
             likesRepository.findByPostAndUser(post, user)
