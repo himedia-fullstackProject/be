@@ -1,6 +1,7 @@
 package com.example.dailyhub.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import com.example.dailyhub.data.dto.PostDTO;
 import com.example.dailyhub.data.entity.MainCategory;
@@ -72,16 +73,14 @@ public class PostService {
                 .updatedAt(post.getUpdatedAt());
 
         if (includeUser) {
-            // 유저 정보를 포함할 경우
             String username = post.getUser() != null ?
                     userRepository.findByUserId(post.getUser().getId())
                             .orElse("유저 정보 없음") : "유저 정보 없음";
             builder.userId(post.getUser() != null ? post.getUser().getId() : null)
                     .username(username);
         } else {
-            // 유저 정보를 포함하지 않을 경우
             builder.userId(null)
-                    .username("정보 없음"); // 유저 정보가 필요 없는 경우
+                    .username("정보 없음");
         }
 
         return builder.build();
@@ -118,7 +117,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm, Pageable pageable) {
+    public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm,Pageable pageable) {
         Page<Post> posts = postRepository.searchPosts(searchTerm, pageable);
         Page<PostDTO> postDTOs = posts.map(post -> convertToDTO(post, true)); // 유저 정보 포함
         return new PageResponse<>(postDTOs);
@@ -157,6 +156,7 @@ public class PostService {
         return new PageResponse<>(postDTOs);
     }
 
+
     public PageResponse<PostDTO> getAllHashTagSearchPosts(String tag, Pageable pageable) {
         Page<Post> tagSearchResultPost = postRepository.findPostsByHashtags(tag, pageable);
         Page<PostDTO> postDTOPage = tagSearchResultPost.map(post -> convertToDTO(post, false)); // 유저 정보 비포함
@@ -167,6 +167,14 @@ public class PostService {
         Page<Post> posts = postRepository.findAll(pageable); // Page<Post>를 가져옴
         return new PageResponse<>(posts.map(post -> convertToDTO(post, true))); // Post를 PostDTO로 변환 후 PageResponse에 전달
     }
+
+    public List<PostDTO> getAllPost2(boolean includeUser) {
+        List<Post> posts = postRepository.findAll(); // 모든 Post 데이터를 가져옴
+        return posts.stream()
+                .map(post -> convertToDTO(post, includeUser)) // convertToDTO 메서드 호출
+                .collect(Collectors.toList()); // List<PostDTO>로 변환
+    }
+
 
 
 }

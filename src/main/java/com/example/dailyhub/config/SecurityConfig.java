@@ -61,8 +61,9 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorize ->
             authorize.requestMatchers("/","/api/users/join", "/api/users/id", "/api/users/check",
                     "/api/login", "/api/logout", "/api/posts/**", "/api/posts/search",
-                    "/api/posts/search/tag", "/api/posts/all")
+                    "/api/posts/search/tag", "/api/posts/all","/api/posts/all2", "/api/posts/{id}")
                 .permitAll()
+                .requestMatchers("/api/categories").permitAll()
                 .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
                 .anyRequest().authenticated()
         );
@@ -72,7 +73,7 @@ public class SecurityConfig {
       config.setAllowCredentials(true);
       config.setAllowedOrigins(
           Arrays.asList("http://localhost:3000", "http://localhost:3001",
-              "http://localhost:3002")
+              "http://localhost:3002", "https://**")
       );
       config.addAllowedHeader("*");
       config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

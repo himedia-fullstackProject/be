@@ -1,26 +1,23 @@
 package com.example.dailyhub.controller;
 
-import com.example.dailyhub.data.dto.PageResponse;
 import com.example.dailyhub.data.dto.PostDTO;
-import com.example.dailyhub.data.dto.SearchRequestDTO;
+import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import com.example.dailyhub.data.dto.SearchRequestDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.PageRequest;
+import com.example.dailyhub.data.dto.PageResponse;
+
+import java.util.List;
+
 
 
 
@@ -30,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     private final PostService postService;
+
 
     /**
      * Post detail 보는 메서드
@@ -89,22 +87,20 @@ public class PostController {
     }
 
     @PreAuthorize("permitAll()")
-    @PostMapping("/search")
+    @GetMapping("/search")
     public ResponseEntity<PageResponse<PostDTO>> searchPosts(
-            @RequestBody SearchRequestDTO searchRequest) {
-        if (StringUtils.isEmpty(searchRequest.getSearchTerm())) {
+            @RequestParam String searchTerms, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size){
+        if (StringUtils.isEmpty(searchTerms)) {
             throw new IllegalArgumentException("검색어를 입력해주세요.");
         }
 
-        Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize());
-
-        PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(
-                searchRequest.getSearchTerm(),
-                pageable
-        );
+        Pageable pageable = PageRequest.of(page,size);
+        PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(searchTerms , pageable);
 
         return ResponseEntity.ok(posts);
     }
+
 
     /**
      * 태그 검색
@@ -142,7 +138,7 @@ public class PostController {
     public ResponseEntity<PageResponse<PostDTO>> getAllPosts(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "6") int size) {
         Pageable pageable = PageRequest.of(page, size);
         PageResponse<PostDTO> posts = postService.getAllPosts(username, pageable);
 
@@ -151,6 +147,7 @@ public class PostController {
 
     /**
      * 전체 포스트 조회
+     *
      * @param page
      * @param size
      * @return 전체 포스트 페이지네이션 정보
@@ -164,5 +161,14 @@ public class PostController {
         PageResponse<PostDTO> posts = postService.getAllPost(pageable);
         return ResponseEntity.ok(posts);
     }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/all2")
+    public ResponseEntity<List<PostDTO>> getAllPost2(
+            @RequestParam(defaultValue = "true") boolean includeUser) {
+        List<PostDTO> posts = postService.getAllPost2(includeUser); // 서비스 호출
+        return ResponseEntity.ok(posts); // 포스트 데이터 반환
+    }
+
 
 }
