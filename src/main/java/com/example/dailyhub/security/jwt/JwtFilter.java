@@ -32,7 +32,9 @@ public class JwtFilter extends OncePerRequestFilter {
     if (requestURI.startsWith("/api/posts/search") ||
             requestURI.startsWith("/api/posts/all") ||
             requestURI.startsWith("/api/posts/{id}") || // 필요에 따라 추가
-            requestURI.startsWith("/api/posts/search/tag")) {
+            requestURI.startsWith("/api/posts/search/tag") ||
+            requestURI.startsWith("/api/sub-categories") ||
+            requestURI.startsWith("/api/main-categories")) {
       filterChain.doFilter(request, response); // 인증 없이 다음 필터로 진행
       return;
     }
