@@ -61,7 +61,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorize ->
             authorize.requestMatchers("/","/api/users/join", "/api/users/id", "/api/users/check",
                     "/api/login", "/api/logout", "/api/posts/**", "/api/posts/search",
-                    "/api/posts/search/tag", "/api/posts/all")
+                    "/api/posts/search/tag", "/api/posts/all" , "/api/posts/{id}")
                 .permitAll()
                 .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
                 .anyRequest().authenticated()
