@@ -1,6 +1,7 @@
 package com.example.dailyhub.controller;
 
 import com.example.dailyhub.data.dto.PostDTO;
+import com.example.dailyhub.data.entity.Post;
 import com.example.dailyhub.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
 import com.example.dailyhub.data.dto.PageResponse;
 
+import java.util.List;
 
 
 @RestController
@@ -104,8 +106,6 @@ public class PostController {
     }
 
 
-
-
     /**
      * 태그 검색
      *
@@ -151,6 +151,7 @@ public class PostController {
 
     /**
      * 전체 포스트 조회
+     *
      * @param page
      * @param size
      * @return 전체 포스트 페이지네이션 정보
@@ -164,5 +165,14 @@ public class PostController {
         PageResponse<PostDTO> posts = postService.getAllPost(pageable);
         return ResponseEntity.ok(posts);
     }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/all2")
+    public ResponseEntity<List<PostDTO>> getAllPost2(
+            @RequestParam(defaultValue = "true") boolean includeUser) {
+        List<PostDTO> posts = postService.getAllPost2(includeUser); // 서비스 호출
+        return ResponseEntity.ok(posts); // 포스트 데이터 반환
+    }
+
 
 }
