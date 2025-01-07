@@ -65,6 +65,7 @@ public class LikesServiceImpl implements LikesService {
         return PostDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
+                .image(post.getImage())
                 .description(post.getDescription())
                 .tag1(post.getTag1())
                 .tag2(post.getTag2())
