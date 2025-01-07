@@ -1,31 +1,30 @@
 package com.example.dailyhub.controller;
 
-import com.example.dailyhub.data.dto.CategoriesResponse;
+import com.example.dailyhub.data.dto.MainCategoryDTO;
+import com.example.dailyhub.data.dto.SubCategoryDTO;
 import com.example.dailyhub.service.CategoryService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.annotation.security.PermitAll;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    @PermitAll
+    @GetMapping("/api/main-categories")
+    public List<MainCategoryDTO> getAllMainCategories() {
+        return categoryService.getAllMainCategories(); // 메인 카테고리 가져오기
     }
 
-    // @PreAuthorize("permitAll()")  // 이 줄을 제거합니다.
-    @GetMapping
-    public ResponseEntity<CategoriesResponse> getAllCategories() {
-        try {
-            CategoriesResponse categoriesResponse = categoryService.getAllCategories();
-            return new ResponseEntity<>(categoriesResponse, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @PermitAll
+    @GetMapping("/api/sub-categories")
+    public List<SubCategoryDTO> getAllSubCategories() {
+        return categoryService.getAllSubCategories(); // 서브 카테고리 가져오기
     }
 }
