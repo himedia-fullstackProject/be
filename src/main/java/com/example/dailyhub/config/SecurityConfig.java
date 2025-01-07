@@ -35,7 +35,9 @@ public class SecurityConfig {
   private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
   @Bean
-  public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
   @Bean
   public AuthenticationManager authenticationManager(
@@ -57,11 +59,13 @@ public class SecurityConfig {
         .formLogin(formLogin -> formLogin.disable())
         .httpBasic(httpBasic -> httpBasic.disable())
         .authorizeHttpRequests(authorize ->
-            authorize
-//                .requestMatchers("/**").permitAll()
-                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
-                .anyRequest().permitAll()
-//                .anyRequest().authenticated()
+            authorize.requestMatchers("/","/api/users/join", "/api/users/id", "/api/users/check",
+                    "/api/login", "/api/logout", "/api/posts/**", "/api/posts/search",
+                    "/api/posts/search/tag", "/api/posts/all","/api/posts/all2", "/api/posts/{id}",
+                            "/api/main-categories", "/api/sub-categories")
+                .permitAll()
+                .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
+                .anyRequest().authenticated()
         );
 
     http.cors(cors -> cors.configurationSource(request -> {
@@ -69,7 +73,7 @@ public class SecurityConfig {
       config.setAllowCredentials(true);
       config.setAllowedOrigins(
           Arrays.asList("http://localhost:3000", "http://localhost:3001",
-              "http://localhost:3002")
+              "http://localhost:3002", "http://localhost","http://15.164.52.27","http://15.164.52.27:80")
       );
       config.addAllowedHeader("*");
       config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -95,16 +99,6 @@ public class SecurityConfig {
 
     http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
         UsernamePasswordAuthenticationFilter.class);
-
-//    http.oauth2Login(oauth2 -> oauth2
-//        .userInfoEndpoint(
-//            userInfo -> userInfo.userService(customOauth2UserService)) // 사용자 정보 서비스 설정
-//        .successHandler(customSuccessHandler) // 로그인 성공 시 핸들러
-//        .failureHandler((request, response, exception) -> { // 로그인 실패 시 핸들러
-//          response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//          response.getWriter().write("OAuth2 Login Failed");
-//        })
-//    );
 
     http.exceptionHandling(exception -> {
           exception.authenticationEntryPoint(customAuthenticationEntryPoint);

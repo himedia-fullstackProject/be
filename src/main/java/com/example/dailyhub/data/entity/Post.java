@@ -44,7 +44,7 @@ public class Post {
   private String title;
 
   @Column(nullable = true)
-  @Size(min = 5, max = 200)
+  @Size(min = 5)
   private String description;
 
   @Column(nullable = true)
@@ -58,6 +58,9 @@ public class Post {
   @Column(nullable = true)
   @Size(max = 10)
   private String tag3;
+
+  @Column(nullable = false)
+  private String image;
 
   @CreatedDate
   @Column(updatable = false)
@@ -81,5 +84,4 @@ public class Post {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
-
 }

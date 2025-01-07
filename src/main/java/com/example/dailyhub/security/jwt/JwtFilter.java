@@ -24,7 +24,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+                                  FilterChain filterChain) throws ServletException, IOException {
+
+    String requestURI = request.getRequestURI();
+
+    // 인증이 필요 없는 엔드포인트 확인
+    if (requestURI.startsWith("/api/posts/search") ||
+            requestURI.startsWith("/api/posts/all") ||
+            requestURI.startsWith("/api/posts/{id}") || // 필요에 따라 추가
+            requestURI.startsWith("/api/posts/search/tag") ||
+            requestURI.startsWith("/api/sub-categories") ||
+            requestURI.startsWith("/api/main-categories")) {
+      filterChain.doFilter(request, response); // 인증 없이 다음 필터로 진행
+      return;
+    }
+
+    // JWT 인증 처리 로직
     String authToken = request.getHeader("Authorization");
     if (authToken == null || !authToken.startsWith("Bearer ")) {
       System.out.println("token null");
@@ -67,6 +82,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     SecurityContextHolder.getContext().setAuthentication(auth);
     filterChain.doFilter(request, response);
-
   }
+
 }

@@ -2,17 +2,15 @@ package com.example.dailyhub.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageDTO {
-
-  private Long id;
-  private String url;
+public class LikesDTO {
+    private Long id; // 좋아요 ID
+    private Long user_id; // 좋아요를 누른 사용자 정보
+    private Long post_id;
 }
