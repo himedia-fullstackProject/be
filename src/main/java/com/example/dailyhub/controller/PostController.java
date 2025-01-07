@@ -19,6 +19,8 @@ import com.example.dailyhub.data.dto.PageResponse;
 import java.util.List;
 
 
+
+
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
@@ -85,22 +87,16 @@ public class PostController {
     }
 
     @PreAuthorize("permitAll()")
-    @PostMapping("/search")
+    @GetMapping("/search")
     public ResponseEntity<PageResponse<PostDTO>> searchPosts(
-            @RequestBody SearchRequestDTO searchRequest) {
-        if (StringUtils.isEmpty(searchRequest.getSearchTerm())) {
+            @RequestParam String searchTerms, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size){
+        if (StringUtils.isEmpty(searchTerms)) {
             throw new IllegalArgumentException("검색어를 입력해주세요.");
         }
 
-        Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize());
-
-        PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(
-                searchRequest.getSearchTerm(),
-                searchRequest.getMainCategoryId(),
-                searchRequest.getSubCategoryId(),
-                searchRequest.getSearchType(),
-                pageable
-        );
+        Pageable pageable = PageRequest.of(page,size);
+        PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(searchTerms , pageable);
 
         return ResponseEntity.ok(posts);
     }
