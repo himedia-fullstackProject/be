@@ -50,7 +50,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             if [ "$(sudo docker ps -a -q -f name=dailyhubdb)" ]; then
-              sudo docker rm -f dockerdb
+              sudo docker rm -f dailyhubdb
             fi 
             if [ "$(sudo docker ps -a -q -f name=dailyhubbackend)" ]; then
               sudo docker rm -f dailyhubbackend
