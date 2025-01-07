@@ -52,10 +52,10 @@ app:
         bucket-name: ${AWS_S3_BUCKET_NAME}
         region: ${AWS_REGION}
 
-
 ---
 
 # local 데이터베이스 설정
+
 spring:
   config:
     activate:
@@ -79,5 +79,6 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
 
 
