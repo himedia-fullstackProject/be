@@ -18,9 +18,6 @@ import com.example.dailyhub.data.dto.PageResponse;
 
 import java.util.List;
 
-
-
-
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
