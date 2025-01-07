@@ -100,17 +100,11 @@ public class PostController {
 
         PageResponse<PostDTO> posts = postService.searchCategoryAndPosts(
                 searchRequest.getSearchTerm(),
-                searchRequest.getMainCategoryId(),
-                searchRequest.getSubCategoryId(),
-                searchRequest.getSearchType(),
                 pageable
         );
 
         return ResponseEntity.ok(posts);
     }
-
-
-
 
     /**
      * 태그 검색

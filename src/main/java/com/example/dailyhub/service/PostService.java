@@ -118,8 +118,8 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm, Long mainCategoryId, Long subCategoryId, String searchType, Pageable pageable) {
-        Page<Post> posts = postRepository.searchPosts(searchTerm, mainCategoryId, subCategoryId, searchType, pageable);
+    public PageResponse<PostDTO> searchCategoryAndPosts(String searchTerm, Pageable pageable) {
+        Page<Post> posts = postRepository.searchPosts(searchTerm, pageable);
         Page<PostDTO> postDTOs = posts.map(post -> convertToDTO(post, true)); // 유저 정보 포함
         return new PageResponse<>(postDTOs);
     }
