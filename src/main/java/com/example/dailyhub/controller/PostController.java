@@ -66,7 +66,7 @@ public class PostController {
      * @param postDTO
      * @return 포스트 수정 상태
      */
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("permitAll()")
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable Long id, @RequestBody PostDTO postDTO) {
         PostDTO updatedPostDTO = postService.updatePost(id, postDTO);
