@@ -133,7 +133,7 @@ public class PostController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping
     public ResponseEntity<PageResponse<PostDTO>> getAllPosts(
-            @RequestParam String username,
+            @PathVariable String username,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {
         Pageable pageable = PageRequest.of(page, size);
