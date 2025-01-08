@@ -159,7 +159,7 @@ public class PostService {
 
     public PageResponse<PostDTO> getAllHashTagSearchPosts(String tag, Pageable pageable) {
         Page<Post> tagSearchResultPost = postRepository.findPostsByHashtags(tag, pageable);
-        Page<PostDTO> postDTOPage = tagSearchResultPost.map(post -> convertToDTO(post, false)); // 유저 정보 비포함
+        Page<PostDTO> postDTOPage = tagSearchResultPost.map(post -> convertToDTO(post, true)); // 유저 정보 비포함
         return new PageResponse<>(postDTOPage);
     }
 
