@@ -1,12 +1,9 @@
 package com.example.dailyhub.security.jwt;
 
-import com.example.dailyhub.data.entity.Likes;
-import com.example.dailyhub.data.entity.Post;
-import com.example.dailyhub.data.entity.User;
+import com.example.dailyhub.domain.user.entity.User;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
