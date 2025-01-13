@@ -38,8 +38,7 @@ public class Image {
   @Column(nullable = false)
   private boolean isTemporary;
 
-  @OneToOne
-  @MapsId
-  @JoinColumn(name = "post_id")
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id", referencedColumnName = "id") // post_tbl의 id를 참조해라
   private Post post;
 }

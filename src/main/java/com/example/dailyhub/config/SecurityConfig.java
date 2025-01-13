@@ -65,7 +65,7 @@ public class SecurityConfig {
                             "/api/test/aws-connection","/**",
                             "/api/main-categories", "/api/sub-categories")
                 .permitAll()
-                .requestMatchers("/api/likes/**", "/api/posts").hasAnyRole("USER")
+                .requestMatchers("/api/likes/**", "/api/posts","/api/images/**").hasAnyRole("USER")
                 .anyRequest().authenticated()
         );
 

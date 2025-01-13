@@ -1,5 +1,7 @@
 package com.example.dailyhub.domain.post.dto;
 
+import com.example.dailyhub.domain.category.entity.MainCategory;
+import com.example.dailyhub.domain.category.entity.SubCategory;
 import com.example.dailyhub.domain.image.dto.ImageDTO;
 import com.example.dailyhub.domain.likes.dto.LikesDTO;
 import java.util.ArrayList;
@@ -20,9 +22,10 @@ public class PostDTO {
     private String title;
     private String description;
     private List<String> tags;
-    private Long mainCategoryId; // Main Category ID
-    private Long subCategoryId; // Sub Category ID
+    private Long mainCategoryId;
+    private Long subCategoryId;
     private Long userId;
+    private String userNickname;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private ImageDTO image;

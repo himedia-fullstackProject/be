@@ -1,8 +1,11 @@
 package com.example.dailyhub.domain.post.service;
 
+import com.example.dailyhub.domain.category.entity.MainCategory;
+import com.example.dailyhub.domain.category.entity.SubCategory;
 import com.example.dailyhub.domain.image.dto.ImageDTO;
 import com.example.dailyhub.domain.post.dto.PostDTO;
 import com.example.dailyhub.domain.post.entity.Post;
+import com.example.dailyhub.domain.user.entity.User;
 import com.example.dailyhub.dto.PageResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -35,6 +38,7 @@ public interface PostService {
         .mainCategoryId(post.getMainCategory().getId())
         .subCategoryId(post.getSubCategory().getId())
         .userId(post.getUser().getId())
+        .userNickname(post.getUser().getNickname())
         .createdAt(post.getCreatedAt())
         .updatedAt(post.getUpdatedAt())
         .image(post.getImage() != null
@@ -55,6 +59,15 @@ public interface PostService {
         .id(postDTO.getId())
         .title(postDTO.getTitle())
         .description(postDTO.getDescription())
+        .mainCategory(postDTO.getMainCategoryId() != null
+            ? MainCategory.builder().id(postDTO.getMainCategoryId()).build()
+            : null)
+        .subCategory(postDTO.getSubCategoryId() != null
+            ? SubCategory.builder().id(postDTO.getSubCategoryId()).build()
+            : null)
+        .user(postDTO.getUserId() != null
+        ? User.builder().id(postDTO.getUserId()).build()
+            : null)
         .build();
   }
 

@@ -94,6 +94,7 @@ public class PostController {
     return postService.searchPosts(searchTerms, pageNo, pageSize, sortBy);
   }
 
+
     /**
      * 태그 검색
      * @param tag
@@ -112,7 +113,7 @@ public class PostController {
   ) {
     return postService.searchPostsByTag(tag, pageNo, pageSize, sortBy);
   }
-
+  // ToDo 현재 tag 검색 잘 안되는거 같음 확인해야됨
     /**
      * 유저가 작성한 포스트 가져오기(페이지네이션)
      * @param username

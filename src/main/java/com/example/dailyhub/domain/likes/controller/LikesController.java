@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class LikesController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/{username}")
     public ResponseEntity<PageResponse> getUserLikedPosts(
-            @RequestParam(required = false) String username,
+            @PathVariable String username,
             @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy) {
@@ -42,6 +43,12 @@ public class LikesController {
         return ResponseEntity.ok(likesService.getUserLikedListsPaged(username, pageNo, pageSize, sortBy));
     }
 
+    /**
+     * 좋아요 추가. 삭제
+     * @param likesDTO
+     * @return true, false 값
+     */
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping
     public ResponseEntity<Boolean> toggleLike(@RequestBody LikesDTO likesDTO) {
         boolean isLiked = likesService.toggleLike(likesDTO.getUser_id(), likesDTO.getPost_id());

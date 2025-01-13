@@ -10,6 +10,8 @@ import com.example.dailyhub.domain.tag.entity.Tag;
 import com.example.dailyhub.domain.tag.repository.PostTagRepository;
 import com.example.dailyhub.domain.tag.repository.TagRepository;
 import com.example.dailyhub.domain.tag.util.TagUtil;
+import com.example.dailyhub.domain.user.entity.User;
+import com.example.dailyhub.domain.user.repository.UserRepository;
 import com.example.dailyhub.dto.PageResponse;
 import com.example.dailyhub.util.AwsS3Util;
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,7 @@ public class PostServiceImpl implements PostService {
   private final TagUtil tagUtil;
   private final PostTagRepository postTagRepository;
   private final TagRepository tagRepository;
+  private final UserRepository userRepository;
 
   @Transactional(readOnly = true)
   @Override
@@ -45,17 +49,30 @@ public class PostServiceImpl implements PostService {
     return toDTO(post);
   }
 
-  @Transactional
   @Override
   public PostDTO createPost(PostDTO postDTO) {
     log.info("createPost start...");
 
-    Post post = toEntity(postDTO);
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    log.info("username is...", username);
 
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Post post = toEntity(postDTO);
+    post.setUser(user);
+    post.setCreatedAt(LocalDateTime.now());
+
+    Post savedPost = postRepository.save(post);
+    log.info("Image processed and linked to post ID: {}", savedPost.getId());
+
+    log.info("Mapping tags to post...");
     List<PostTag> postTags = tagUtil.mapTagsToPost(post, postDTO.getTags());
     post.setPostTags(postTags);
+    log.info("Tags mapped successfully: {}", postTags.size());
 
     if (postDTO.getImage() != null) {
+      log.info("Processing image with ID: {}", postDTO.getImage().getId());
       Image image = imageRepository.findById(postDTO.getImage().getId())
           .orElseThrow(() -> new RuntimeException("Image not found"));
 
@@ -67,12 +84,14 @@ public class PostServiceImpl implements PostService {
       image.setTemporary(false);
       imageRepository.save(image);
       post.setImage(image);
+
     }
 
-    Post savedPost = postRepository.save(post);
-
+    log.info("createPost end...");
     return toDTO(savedPost);
   }
+
+  // ToDo 현재 글 작성시, 2개 작성되고, createAt 값 안들어감
 
   @Transactional
   @Override
@@ -137,6 +156,8 @@ public class PostServiceImpl implements PostService {
 
     postRepository.delete(post);
   }
+
+  // ToDo 현재 글 삭제 할때, tag count 값 줄어들지 않음
 
   @Transactional(readOnly = true)
   @Override

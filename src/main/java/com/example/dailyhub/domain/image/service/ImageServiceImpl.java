@@ -4,6 +4,8 @@ import com.example.dailyhub.domain.image.entity.Image;
 import com.example.dailyhub.domain.image.repository.ImageRepository;
 import com.example.dailyhub.util.AwsS3Util;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,11 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Transactional
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
@@ -33,8 +37,15 @@ public class ImageServiceImpl implements ImageService {
   public Image uploadTempImage(MultipartFile file) {
     Path tempFilePath = null;
     try {
+      // 파일 저장 경로 확인 및 생성
+      Path tempDir = Paths.get("temp");
+      if (!Files.exists(tempDir)) {
+        Files.createDirectories(tempDir); // 폴더가 없으면 생성
+        log.info("임시 폴더 생성: {}", tempDir.toAbsolutePath());
+      }
+
       // 파일 이름 생성
-      String fileName = UUID.randomUUID() + file.getOriginalFilename();
+      String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
       tempFilePath = Paths.get("temp", fileName);
 
       // 임시 디렉토리에 파일 저장
@@ -42,14 +53,17 @@ public class ImageServiceImpl implements ImageService {
 
       // S3 업로드
       awsS3Util.uploadFiles(List.of(tempFilePath), true);
-      String url = "https://s3.amazonaws.com/" + awsS3Util.getBucketName() + "/" + fileName;
+      String url = awsS3Util.getFileUrl(fileName);
 
       // DB 저장
       Image image = Image.builder()
           .url(url)
           .isTemporary(true)
+          .post(null)
           .build();
+
       return imageRepository.save(image);
+
     } catch (IOException e) {
       throw new RuntimeException("파일 업로드 실패", e);
     } finally {
@@ -58,7 +72,7 @@ public class ImageServiceImpl implements ImageService {
         try {
           Files.delete(tempFilePath);
         } catch (IOException ex) {
-          throw new RuntimeException("임시 파일 삭제 실패", ex);
+          log.warn("임시 파일 삭제 실패: {}", tempFilePath, ex);
         }
       }
     }
@@ -91,9 +105,13 @@ public class ImageServiceImpl implements ImageService {
     Image image = imageRepository.findById(imageId)
         .orElseThrow(() -> new RuntimeException("Image not found"));
 
+    // URL 디코딩을 통해 정확한 파일 키 추출
+    String encodedFileKey = image.getUrl().substring(image.getUrl().lastIndexOf("/") + 1);
+    String decodedFileKey = URLDecoder.decode(encodedFileKey, StandardCharsets.UTF_8);
+    log.info("Decoded file key: {}", decodedFileKey);
+
     // S3 파일 삭제
-    String fileKey = image.getUrl().substring(image.getUrl().lastIndexOf("/") + 1);
-    awsS3Util.deleteFilesByKeys(List.of(fileKey));
+    awsS3Util.deleteFilesByKeys(List.of(decodedFileKey));
 
     // DB 삭제
     imageRepository.delete(image);
